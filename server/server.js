@@ -4,22 +4,23 @@ const express = require('express');
 const puppeteer = require('puppeteer')
 require('dotenv').config()
 const AWS = require('aws-sdk')
-const { fileURL } = require('./utils')
-const {ipcRenderer} = require('electron')
+const { fileURL } = require('./utils/fileURL')
+const { ipcRenderer } = require('electron');
+const resizeRender = require('./utils/resizeRender');
 
 const server = express();
-server.use(express.json({limit: '10gb'}))
+server.use(express.json({ limit: '10gb' }))
 var serverListener = undefined
 let port = '8008'
 
-async function serverStatus  (data) {
+async function serverStatus(data) {
     console.log('received', data)
 
-    if(data.server){
-        serverListener = await server.listen(port, ()=> {
+    if (data.server) {
+        serverListener = await server.listen(port, () => {
             console.log(`Example app listening on port ${port}`)
         });
-    }else{
+    } else {
         serverListener.close(() => {
             console.log('Closed out remaining connections');
         });
@@ -28,31 +29,31 @@ async function serverStatus  (data) {
 }
 
 server.post('/render', async (req, res) => {
-    let body = req.body
+    const { body } = req;
     // let response = false
     if (body.folder === '' || body.folder === undefined) {
         res.setHeader('Content-Type', 'Response')
         res.status(400).send()
-    }else{
-        try{
+    } else {
+        try {
             let response = await renderProcess(body)
-            if(response){
+            if (response) {
                 res.setHeader('Content-Type', 'application/json')
                 res.json({
                     b64: response
                 })
                 res.status(200).send()
-            }else{
+            } else {
                 res.status(400).send()
             }
-        }catch(error){
+        } catch (error) {
             console.log('in calling function')
             res.status(400).send()
         }
     }
 });
 
-async function renderProcess({camera, folder, scene, targetMaterialName, texture, colladaEncrypt, webGl}){
+async function renderProcess({ camera, folder, scene, targetMaterialName, texture, finalFrameWidth, finalFrameHeight, colladaEncrypt, webGl }) {
     AWS.config.update({
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
@@ -62,18 +63,19 @@ async function renderProcess({camera, folder, scene, targetMaterialName, texture
         Bucket: process.env.AWS_BUCKET,
         Key: folder + '/collada.dae'
     }
-    try{
+    try {
         await s3.headObject(params).promise()
         params.Expires = 30
         const signedUrl = await s3.getSignedUrl('getObject', params)
         console.log('signed -> ', signedUrl)
+
         const itemData = {
             sceneFileURL: signedUrl,
             texture,
             targetMaterialName,
             camera,
             scene
-          }
+        }
         const browser = await puppeteer.launch({
             args: [
                 '--no-sandbox',
@@ -82,7 +84,7 @@ async function renderProcess({camera, folder, scene, targetMaterialName, texture
                 '--disable-site-isolation-trials',
                 "--enable-webgl",
                 "--use-gl=angle"
-              ]
+            ]
         })
 
         const page = await browser.newPage()
@@ -98,14 +100,16 @@ async function renderProcess({camera, folder, scene, targetMaterialName, texture
         await page.waitForSelector('#rendered')
 
         const data = await page.evaluate(() => {
-        return document.querySelector('canvas#app').toDataURL()
+            return document.querySelector('canvas#app').toDataURL()
         })
         base64 = data.split(';base64,')[1]
-        await browser.close()
+        await browser.close();
+        if( finalFrameWidth !== camera.frameWidth && finalFrameHeight !== camera.frameHeight) {
+            base64 = await resizeRender(base64, finalFrameWidth, finalFrameHeight);
+        }
+        return base64.toString('base64')
 
-        return base64
-
-    }catch(error){
+    } catch (error) {
         console.log('Throwing...', error.code, error.message)
         throw new Error()
     }
