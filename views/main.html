@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" class="spectrum spectrum--light spectrum--medium">
+  <head>
+    <link rel="stylesheet" href="style.css">
+    <title>Original Mockups Toolkit</title>
+  </head>
+  <body>
+  <script src="../controllers/preload.js">
+  </script>
+    <h3 class="spectrum-Heading spectrum-Heading--sizeM">Toolkit</h1>
+    <!-- Photoshop Tools-->
+    <span class="category">Photoshop Plugins</span>
+    <div class="item">
+      <img src="../assets/psLogo.png" alt="Avatar" class="avatar">
+      <span class="spectrum-Body spectrum-Body--sizeXS">Mockup Baker plugin</span>
+      <button onclick="installPlugin()" class="spectrum-Button spectrum-Button--fill spectrum-Button--primary spectrum-Button--sizeS buttonInstall">
+        <span class="spectrum-Button-label font-size-50">Install</span>
+      </button>
+      <button onclick="installPlugin()" class="spectrum-Button spectrum-Button--fill spectrum-Button--primary spectrum-Button--sizeS buttonTry">
+        <span class="spectrum-Button-label font-size-50">Try again</span>
+      </button>
+      <!-- Progress circle -->
+      <div class="spectrum-ProgressCircle spectrum-ProgressCircle--indeterminate spectrum-ProgressCircle--small">
+        <div class="spectrum-ProgressCircle-track"></div>
+        <div class="spectrum-ProgressCircle-fills">
+          <div class="spectrum-ProgressCircle-fillMask1">
+            <div class="spectrum-ProgressCircle-fillSubMask1">
+              <div class="spectrum-ProgressCircle-fill"></div>
+            </div>
+          </div>
+          <div class="spectrum-ProgressCircle-fillMask2">
+            <div class="spectrum-ProgressCircle-fillSubMask2">
+              <div class="spectrum-ProgressCircle-fill"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br />
+    </div>
+    <p class="spectrum-Body spectrum-Body--sizeXS detailError">Error in installation of Plugin</p>
+    <br />
+    <!-- Mockup Baker Tools-->
+    <span class="category">Mockup Baker Tools</span>
+    <div class="item">
+      <span style="padding-left: 0%">Enable rendering</span>
+      <div class="spectrum-Switch spectrum-Switch--" onclick="toggleSwitch()">
+        <input type="checkbox" class="spectrum-Switch-input" id="switch-onoff">
+        <span class="spectrum-Switch-switch"></span>
+      </div>
+    </div>
+</body>
+</html>

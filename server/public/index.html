@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vite App</title>
+  <script type="module">
+    //assets/index.d9029e07.js
+    import * as n from "https://cdn.skypack.dev/three@0.135.0";
+    import { ColladaLoader as h } from "https://cdn.skypack.dev/three@0.135.0/examples/jsm/loaders/ColladaLoader.js";
+
+    const g = function () {
+      const c = document.createElement("link").relList;
+      if (c && c.supports && c.supports("modulepreload"))
+        return;
+      for (const e of document.querySelectorAll('link[rel="modulepreload"]'))
+        l(e);
+      new MutationObserver(e => {
+        for (const r of e)
+          if (r.type === "childList")
+            for (const f of r.addedNodes)
+              f.tagName === "LINK" && f.rel === "modulepreload" && l(f)
+      }).observe(document, { 
+        childList: !0, 
+        subtree: !0 
+      }); 
+      function m(e) {
+        const r = {};
+        return e.integrity && (
+          r.integrity = e.integrity
+          ), 
+          e.referrerpolicy && (
+            r.referrerPolicy = e.referrerpolicy
+            ), 
+            e.crossorigin === "use-credentials" ? r.credentials = "include" : e.crossorigin === "anonymous" ? r.credentials = "omit" : r.credentials = "same-origin", r
+      } function l(e) { if (e.ep) return; e.ep = !0; const r = m(e); fetch(e.href, r) }
+    }; g(); let t, i, s;
+
+    window.renderScene = async o => { 
+      const c = document.querySelector("#app"); 
+      s = new n.WebGLRenderer({ 
+        antialias: !0, 
+        canvas: c, 
+        alpha: !0, 
+        preserveDrawingBuffer: !0 
+      }), 
+      s.setPixelRatio(1), 
+      s.setSize(o.camera.frameWidth, o.camera.frameHeight), 
+      s.outputEncoding = n.sRGBAEncoding, 
+      s.setClearColor(new n.Color(16711680), 0), 
+      
+      i = new n.Scene; 
+      
+      const m = new n.AmbientLight(16777215); 
+      i.add(m); 
+      
+      const l = new n.TextureLoader; 
+      l.crossOrigin = "Anonymous"; 
+
+      function e(d) { 
+        return new Promise(u => { 
+          l.load(d, u) 
+        }) 
+      } 
+      const r = await e(o.texture); 
+      new h().load(o.sceneFileURL, 
+
+      function (d) { 
+        let u = d.scene; 
+        if (u.traverse(function (a) { 
+          a.isMesh && (
+            a.material.color = new n.Color(16777215), 
+            a.material.blending = n.NoBlending, 
+            a.material.alphaTest = .5, 
+            a.material.transparent = !1,
+            a.material.map = r,
+            a.material.name == o.targetMaterialName && 
+            (a.material.map = r)
+            ) 
+          }), 
+          i.add(u),
+
+          t = i.getObjectByName(o.camera.name), 
+          !t
+        ) 
+        throw new Error("Camera not found"); 
+        t.aspect = o.camera.frameWidth / o.camera.frameHeight, 
+        t.type == "OrthographicCamera" && (
+          t.zoom = i.getObjectByName("zoom").position.x * 100 || 20, 
+          t.left = -t.aspect, 
+          t.right = t.aspect, 
+          t.top = 1, t.bottom = -1
+        ), 
+        t.updateProjectionMatrix(), 
+        s.render(i, t); 
+        let p = document.createElement("div"); 
+        p.setAttribute("id", "rendered"), 
+        document.body.appendChild(p) 
+      }, 
+      void 0, 
+      d => console.error(d)) 
+    };
+
+  </script>
+  <!-- assets/style.4a04af6b.css -->
+  <style type="text/css">
+    html,
+    body {
+      margin: 0;
+      padding: 0
+    }
+
+    #app {
+      font-family: Avenir, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-align: center;
+      color: #2c3e50
+    }
+  </style>
+</head>
+
+<body>
+  <div class="canvas-container">
+    <canvas id="app"></canvas>
+  </div>
+
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "testelectron",
+  "version": "1.0.0",
+  "description": "Test electron app",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "@cesarphernandez",
+  "license": "MIT",
+  "dependencies": {
+    "@spectrum-css/button": "^6.0.12",
+    "@spectrum-css/page": "^5.0.10",
+    "@spectrum-css/progresscircle": "^1.0.22",
+    "@spectrum-css/switch": "^1.0.22",
+    "@spectrum-css/typography": "^4.0.19",
+    "@spectrum-css/vars": "^8.0.0",
+    "electron": "^19.0.4",
+    "aws-sdk": "^2.1151.0",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "puppeteer": "^14.3.0"
+  }
+}
