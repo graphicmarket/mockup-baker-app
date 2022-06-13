@@ -4,9 +4,10 @@ const path = require('path');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-const {app, BrowserWindow, Menu, ipcMain} = electron;
+const {app, BrowserWindow, Menu, ipcMain, Tray, nativeImage} = electron;
 
 let mainWindow;
+let tray = null
 ipcMain.on("msg", async (event,data) =>{
     let result;
     if (process.platform == 'darwin') {
@@ -24,6 +25,28 @@ ipcMain.on("msg", async (event,data) =>{
     }
 })
 
+app.whenReady().then(() => {
+  tray = new Tray('./assets/baker-min.png')
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Minimize',
+        click:  function(){
+            mainWindow.minimize();
+        } 
+    },
+    { label: 'Quit',
+        accelerator: process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q', 
+        click:  function(){
+            app.quit();
+        }
+    }
+  ])
+  tray.setToolTip('Toolkit.')
+  //tray.setContextMenu(contextMenu)
+  tray.on('click', () => {
+    mainWindow.show();
+    //mainWindow.setAlwaysOnTop(true);
+  });
+})
 //Listen for app to be ready 
 app.on('ready', function() {
     //Create new window
