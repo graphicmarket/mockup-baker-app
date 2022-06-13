@@ -104,11 +104,11 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
         base64 = data.split(';base64,')[1]
         await browser.close();
         //Remove collada
-        await fs.unlink('./mockups/collada.dae', (err) => {
-            if (err) {throw err;}
-        });
-        if( finalFrameWidth !== camera.frameWidth && finalFrameHeight !== camera.frameHeight) {
-            base64 = await resizeRender(base64, finalFrameWidth, finalFrameHeight);
+        // await fs.unlink('./mockups/collada.dae', (err) => {
+        //     if (err) {throw err;}
+        // });
+        if( camera.finalFrameWidth !== camera.frameWidth && camera.finalFrameHeight !== camera.frameHeight) {
+            base64 = await resizeRender(base64, camera.finalFrameWidth, camera.finalFrameHeight);
         }
         return base64.toString('base64')
 
