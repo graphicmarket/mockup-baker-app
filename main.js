@@ -52,7 +52,7 @@ app.on('ready', function() {
     //Create new window
     mainWindow = new BrowserWindow({
         width: 350, // here I have set the width and height
-        height: 450,
+        height: 470,
         resizable: true,
         fullscreenable: false,
         webPreferences: {

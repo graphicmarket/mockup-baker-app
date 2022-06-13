@@ -20,16 +20,20 @@ let port = '8008'
 async function serverStatus(data) {
     console.log('received', data)
 
-    if (data.server) {
-        serverListener = await server.listen(port, () => {
-            console.log(`Example app listening on port ${port}`)
-        });
-    } else {
-        serverListener.close(() => {
-            console.log('Closed out remaining connections');
-        });
+    try{
+        if (data.server) {
+            serverListener = await server.listen(port, () => {
+                console.log(`Example app listening on port ${port}`)
+            });
+        } else {
+            serverListener.close(() => {
+                console.log('Closed out remaining connections');
+            });
+        }
+        return true
+    }catch(e){
+        return false
     }
-    return true
 }
 server.get('/collada',function(req,res) {
     res.sendFile(path.resolve(__dirname, 'mockups', 'collada.dae'));

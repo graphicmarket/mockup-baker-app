@@ -16,6 +16,7 @@
     "@spectrum-css/switch": "^1.0.22",
     "@spectrum-css/typography": "^4.0.19",
     "@spectrum-css/vars": "^8.0.0",
+    "@spectrum-web-components/card": "^0.10.11",
     "aws-sdk": "^2.1151.0",
     "dotenv": "^16.0.1",
     "electron": "^19.0.4",
