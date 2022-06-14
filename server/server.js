@@ -20,16 +20,20 @@ let port = '8008'
 async function serverStatus(data) {
     console.log('received', data)
 
-    if (data.server) {
-        serverListener = await server.listen(port, () => {
-            console.log(`Example app listening on port ${port}`)
-        });
-    } else {
-        serverListener.close(() => {
-            console.log('Closed out remaining connections');
-        });
+    try{
+        if (data.server) {
+            serverListener = await server.listen(port, () => {
+                console.log(`Example app listening on port ${port}`)
+            });
+        } else {
+            serverListener.close(() => {
+                console.log('Closed out remaining connections');
+            });
+        }
+        return true
+    }catch(e){
+        return false
     }
-    return true
 }
 server.get('/collada',function(req,res) {
     res.sendFile(path.resolve(__dirname, 'mockups', 'collada.dae'));
@@ -104,11 +108,11 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
         base64 = data.split(';base64,')[1]
         await browser.close();
         //Remove collada
-        await fs.unlink('./mockups/collada.dae', (err) => {
-            if (err) {throw err;}
-        });
-        if( finalFrameWidth !== camera.frameWidth && finalFrameHeight !== camera.frameHeight) {
-            base64 = await resizeRender(base64, finalFrameWidth, finalFrameHeight);
+        // await fs.unlink('./mockups/collada.dae', (err) => {
+        //     if (err) {throw err;}
+        // });
+        if( camera.finalFrameWidth !== camera.frameWidth && camera.finalFrameHeight !== camera.frameHeight) {
+            base64 = await resizeRender(base64, camera.finalFrameWidth, camera.finalFrameHeight);
         }
         return base64.toString('base64')
 
