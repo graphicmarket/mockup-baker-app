@@ -11,7 +11,7 @@
   <body>
   <script src="../controllers/preload.js">
   </script>
-
+  <sp-theme scale="medium" color="ligth">
     <sp-illustrated-message
     heading="Mockup Baker"
     description="Mockup Baker plugin Toolkit description"
@@ -34,15 +34,10 @@
         </g>
     </svg>
     </sp-illustrated-message>
-    <!-- Photoshop Tools-->
-    <div class="description">Mockup baker toolkit plugin description</div>
     <div class="item">
-      <button onclick="installPlugin()" class="spectrum-Button spectrum-Button--fill spectrum-Button--primary spectrum-Button--sizeS buttonInstall">
-        <span class="spectrum-Button-label font-size-50">Install </span>
-      </button>
-      <button onclick="installPlugin()" class="spectrum-Button spectrum-Button--fill spectrum-Button--primary spectrum-Button--sizeS buttonTry">
-        <span class="spectrum-Button-label font-size-50">Try again</span>
-      </button>
+        <sp-button quiet variant="primary" class="buttonInstall" onclick="installPlugin()">Install Mockup Baker Plugin</sp-button>
+        <sp-button quiet variant="primary" class="buttonTry" onclick="installPlugin()">Try again</sp-button>
+        <sp-button quiet variant="negative" class="buttonUninstall">Uninstall Plugin</sp-button>
       <!-- Progress circle -->
       <sp-progress-circle
           label="A small representation of a partially completed action"
@@ -54,22 +49,30 @@
     <p class="spectrum-Body spectrum-Body--sizeXS detailError">Error on Plugin instalation</p>
     <!-- Mockup Baker Tools-->
     <div class="item">
-      <sp-switch label="Switch" onclick="example(this)">
+      <sp-switch label="Switch" onclick="toogleSwitch(this)">
         Running
       </sp-switch>
     </div>
 
+    <sp-toast open variant="positive" id="installer_success" style="display: none;" onclick="hideElement(this)">
+      Mockup baker Plugin installed
+    </sp-toast>
+
+    <sp-toast open variant="negative" id="installer_fail" style="display: none;" onclick="hideElement(this)">
+      Mockup baker Plugin not installed
+    </sp-toast>
+
     <sp-toast open variant="info" id="server_status_on" style="display: none;" onclick="hideElement(this)">
-        El servicio de render se encuentra activo.
+      Render service enabled
     </sp-toast>
 
     <sp-toast open variant="info" id="server_status_off" style="display: none;" onclick="hideElement(this)">
-      El servicio de render se encuentra inactivo.
+      Render service is disabled
     </sp-toast>
     
     <sp-toast open variant="negative" id="server_status_error" style="display: none;" onclick="hideElement(this)">
-      No ha sido posible encender el servidor.
+      It has not been possible to turn on the render service.
     </sp-toast>
-    
+  </sp-theme>
 </body>
 </html>

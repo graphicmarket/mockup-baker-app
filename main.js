@@ -4,17 +4,17 @@ const path = require('path');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-const {app, BrowserWindow, Menu, ipcMain, Tray, nativeImage} = electron;
+const {app, BrowserWindow, Menu, ipcMain, Tray, nativeTheme, dock} = electron;
 
 let mainWindow;
 let tray = null
-ipcMain.on("msg", async (event,data) =>{
+ipcMain.on("installPlugin", async (event,data) =>{
     let result;
     if (process.platform == 'darwin') {
-        let { stdout, stderr } = await exec('./cmd/installPluginMac.sh');
+        let { stdout, stderr } = await exec('./cmd/osx/installPluginMac.sh');
         result = stdout.split("\n").slice(2).join("\n")
     } else {
-        let { stdout, stderr } = await exec('./cmd/installPluginWin.sh');
+        let { stdout, stderr } = await exec('./cmd/win/installPluginWin.sh');
         result = stdout.split("\n").slice(2).join("\n")
     }
     console.log(result)
@@ -24,13 +24,16 @@ ipcMain.on("msg", async (event,data) =>{
         event.reply("replyInstallPlugin", false)
     }
 })
+nativeTheme.on('updated', function theThemeHasChanged () {
+    console.log(nativeTheme.shouldUseDarkColors)
+})
 
 app.whenReady().then(() => {
-  tray = new Tray('./assets/baker-min.png')
+  tray = new Tray('./assets/baker-menu-bar.png')
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Minimize',
+    { label: 'Show App',
         click:  function(){
-            mainWindow.minimize();
+            mainWindow.show();
         } 
     },
     { label: 'Quit',
@@ -41,14 +44,16 @@ app.whenReady().then(() => {
     }
   ])
   tray.setToolTip('Toolkit.')
-  //tray.setContextMenu(contextMenu)
-  tray.on('click', () => {
-    mainWindow.show();
-    //mainWindow.setAlwaysOnTop(true);
-  });
+  tray.setContextMenu(contextMenu)
+//   tray.on('click', () => {
+//     mainWindow.show();
+//     //mainWindow.setAlwaysOnTop(true);
+//   });
 })
 //Listen for app to be ready 
 app.on('ready', function() {
+    app.dock.setIcon('./assets/baker-dock-icon.png')
+    //app.dock.hide()
     //Create new window
     mainWindow = new BrowserWindow({
         width: 350, // here I have set the width and height
@@ -114,3 +119,22 @@ const mainMenuTemplate = [
         ]
     },
 ];
+
+//Function 
+async function verifyPlugin () {
+    if (process.platform == 'darwin') {
+        let { stdout, stderr } = await exec('./cmd/osx/verifyPlugin.sh');
+        //console.log(stdout)
+        let parseResult = stdout.match(/[^\r\n]+/g);
+        for (let line of parseResult) {
+            if (line.includes("Mockup Baker")) {
+                console.log("Installed", line)
+            }
+        }
+        result = stdout.split("\n").slice(2).join("\n")
+    } else {
+        let { stdout, stderr } = await exec('./cmd/win/verifyPlugin.sh');
+        result = stdout.split("\n").slice(2).join("\n")
+    }
+    //console.log(result)
+}

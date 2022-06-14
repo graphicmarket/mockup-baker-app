@@ -51,14 +51,11 @@
     padding-left: 5%;
     font-size: 15px;
 }
-.item .buttonInstall span {
-    font-size: 10px;
-}
 .item .buttonTry {
     display: none;
 }
-.item .buttonTry span {
-    font-size: 10px;
+.item .buttonUninstall {
+    display: none;
 }
 .detailError {
     display: none;
