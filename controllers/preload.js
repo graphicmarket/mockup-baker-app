@@ -1,5 +1,16 @@
+validatePlugin()
+async function validatePlugin () {
+    const {ipcRenderer} = require('electron')
+    ipcRenderer.send("validatePlugin",'validate')
+    ipcRenderer.on ("replyValidatePlugin", (event,data) => {
+        if (data) {
+            document.querySelector(".buttonInstall").style.display = 'none';
+            document.querySelector(".buttonUninstall").style.display = 'block';
+        }
+    })
+}
+
 function toogleSwitch(switcher){
-    console.log(switcher)
     let status = switcher.getAttribute('checked');
     console.log('is checked? ', status === null);
     toggleServer(status === null);
@@ -13,7 +24,6 @@ function installPlugin () {
     document.querySelector(".buttonTry").style.display = 'none';
     document.querySelector(".progress-custom").style.display = 'block';
     ipcRenderer.on ("replyInstallPlugin", (event,data) => {
-        console.log(data)
         document.querySelector(".progress-custom").style.display = 'none';
         if(data) {
             document.querySelector(".detailError").style.display = 'none';
@@ -41,7 +51,7 @@ async function toggleServer(status){
         if(status){
             document.getElementById('server_status_on').style.display = 'flex'
             setTimeout(() =>{
-                hideElement(document.getElementById('server_status_on'))
+                setTimeout(hideElement(document.getElementById('server_status_on')), 500)
             }, 3000)
         }else{
             document.getElementById('server_status_off').style.display = 'flex'

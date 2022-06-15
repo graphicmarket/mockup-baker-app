@@ -1,13 +1,9 @@
-@import '../node_modules/@spectrum-css/vars/dist/spectrum-global.css';
-@import '../node_modules/@spectrum-css/vars/dist/spectrum-medium.css';
-@import '../node_modules/@spectrum-css/vars/dist/spectrum-light.css';
-@import '../node_modules/@spectrum-css/page/dist/index-vars.css';
-@import '../node_modules/@spectrum-css/button/dist/index-vars.css';
-@import '../node_modules/@spectrum-css/button/dist/index-vars.css';
-@import '../node_modules/@spectrum-css/switch/dist/index-vars.css';
-@import '../node_modules/@spectrum-css/progresscircle/dist/index-vars.css';
-@import '../node_modules/@spectrum-css/typography/dist/index-vars.css';
-
+@import '../node_modules/@spectrum-web-components/styles/typography.css';
+@import '../node_modules/@spectrum-web-components/styles/theme-darkest.css';
+@import '../node_modules/@spectrum-web-components/styles/theme-lightest.css';
+@import '../node_modules/@spectrum-web-components/styles/all-medium-lightest.css';
+@import '../node_modules/@spectrum-web-components/styles/scale-medium.css';
+@import '../node_modules/@spectrum-web-components/illustrated-message/sp-illustrated-message.js';
 .spectrum-Heading {
     display: block;
     margin: auto;

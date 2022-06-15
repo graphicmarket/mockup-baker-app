@@ -24,6 +24,25 @@ ipcMain.on("installPlugin", async (event,data) =>{
         event.reply("replyInstallPlugin", false)
     }
 })
+ipcMain.on("validatePlugin", async (event,data) =>{
+    let parseResult;
+    if (process.platform == 'darwin') {
+        let { stdout, stderr } = await exec('./cmd/osx/verifyPlugin.sh');
+        parseResult = stdout.match(/[^\r\n]+/g);
+       
+    } else {
+        let { stdout, stderr } = await exec('./cmd/win/verifyPlugin.sh');
+        parseResult = stdout.match(/[^\r\n]+/g);
+    }
+    for (let line of parseResult) {
+        if (line.includes("Mockup Baker")) {
+            console.log("Installed", line)
+            event.reply("replyValidatePlugin", true)
+        } else {
+            event.reply("replyValidatePlugin", false)
+        }
+    }
+})
 nativeTheme.on('updated', function theThemeHasChanged () {
     console.log(nativeTheme.shouldUseDarkColors)
 })
@@ -53,7 +72,7 @@ app.whenReady().then(() => {
 //Listen for app to be ready 
 app.on('ready', function() {
     app.dock.setIcon('./assets/baker-dock-icon.png')
-    //app.dock.hide()
+    app.dock.hide()
     //Create new window
     mainWindow = new BrowserWindow({
         width: 350, // here I have set the width and height
@@ -119,22 +138,3 @@ const mainMenuTemplate = [
         ]
     },
 ];
-
-//Function 
-async function verifyPlugin () {
-    if (process.platform == 'darwin') {
-        let { stdout, stderr } = await exec('./cmd/osx/verifyPlugin.sh');
-        //console.log(stdout)
-        let parseResult = stdout.match(/[^\r\n]+/g);
-        for (let line of parseResult) {
-            if (line.includes("Mockup Baker")) {
-                console.log("Installed", line)
-            }
-        }
-        result = stdout.split("\n").slice(2).join("\n")
-    } else {
-        let { stdout, stderr } = await exec('./cmd/win/verifyPlugin.sh');
-        result = stdout.split("\n").slice(2).join("\n")
-    }
-    //console.log(result)
-}
