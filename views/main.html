@@ -37,7 +37,7 @@
     <div class="item">
         <sp-button quiet variant="primary" class="buttonInstall" onclick="installPlugin()">Install Mockup Baker Plugin</sp-button>
         <sp-button quiet variant="primary" class="buttonTry" onclick="installPlugin()">Try again</sp-button>
-        <sp-button quiet variant="negative" class="buttonUninstall">Uninstall Plugin</sp-button>
+        <sp-button quiet variant="negative" class="buttonUninstall" onclick="uninstallPlugin()">Uninstall Plugin</sp-button>
       <!-- Progress circle -->
       <sp-progress-circle
           label="A small representation of a partially completed action"
@@ -49,7 +49,7 @@
     <p class="spectrum-Body spectrum-Body--sizeXS detailError">Error on Plugin instalation</p>
     <!-- Mockup Baker Tools-->
     <div class="item">
-      <sp-switch label="Switch" onclick="toogleSwitch(this)">
+      <sp-switch label="Switch" id="togglerServer" onclick="toogleSwitch(this)">
         Running
       </sp-switch>
     </div>
@@ -74,5 +74,8 @@
       It has not been possible to turn on the render service.
     </sp-toast>
   </sp-theme>
+  <script>
+    validatePlugin()
+  </script>
 </body>
 </html>

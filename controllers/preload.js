@@ -1,4 +1,4 @@
-validatePlugin()
+
 async function validatePlugin () {
     const {ipcRenderer} = require('electron')
     ipcRenderer.send("validatePlugin",'validate')
@@ -6,6 +6,8 @@ async function validatePlugin () {
         if (data) {
             document.querySelector(".buttonInstall").style.display = 'none';
             document.querySelector(".buttonUninstall").style.display = 'block';
+            document.getElementById('togglerServer').setAttribute('checked', true)
+            toggleServer(true)
         }
     })
 }
@@ -32,6 +34,36 @@ function installPlugin () {
             setTimeout(() =>{
                 setTimeout(hideElement(document.getElementById('server_status_off')), 500)
             }, 3000)
+            document.getElementById('togglerServer').setAttribute('checked', true)
+            toggleServer(true)
+        } else {
+            document.querySelector(".buttonTry").style.display = 'block';
+            document.querySelector(".detailError").style.display = 'block';
+            document.getElementById('installer_fail').style.display = 'flex'
+            setTimeout(() =>{
+                setTimeout(hideElement(document.getElementById('server_status_off')), 500)
+            }, 3000)
+        }
+    })
+}
+
+function uninstallPlugin(){
+    const {ipcRenderer} = require('electron')
+    ipcRenderer.send("uninstallPlugin",'shows app window')
+    document.querySelector(".buttonUninstall").style.display = 'none';
+    document.querySelector(".buttonTry").style.display = 'none';
+    document.querySelector(".progress-custom").style.display = 'block';
+    ipcRenderer.on ("replyUninstallPlugin", (event,data) => {
+        document.querySelector(".progress-custom").style.display = 'none';
+        if(data) {
+            document.querySelector(".detailError").style.display = 'none';
+            document.getElementById('installer_success').style.display = 'none';
+            document.querySelector(".buttonInstall").style.display = 'block';
+            setTimeout(() =>{
+                setTimeout(hideElement(document.getElementById('server_status_off')), 500)
+            }, 3000)
+            document.getElementById('togglerServer').removeAttribute('checked')
+            toggleServer(false)
         } else {
             document.querySelector(".buttonTry").style.display = 'block';
             document.querySelector(".detailError").style.display = 'block';
