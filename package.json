@@ -1,5 +1,5 @@
 {
-  "name": "testelectron",
+  "name": "toolkit",
   "version": "1.0.0",
   "description": "Test electron app",
   "main": "main.js",

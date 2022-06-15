@@ -4,11 +4,11 @@ const path = require('path');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-const {app, BrowserWindow, Menu, ipcMain, Tray, nativeImage} = electron;
+const { app, BrowserWindow, Menu, ipcMain, Tray, nativeImage } = electron;
 
 let mainWindow;
 let tray = null
-ipcMain.on("msg", async (event,data) =>{
+ipcMain.on("msg", async (event, data) => {
     let result;
     if (process.platform == 'darwin') {
         let { stdout, stderr } = await exec('./cmd/installPluginMac.sh');
@@ -26,29 +26,31 @@ ipcMain.on("msg", async (event,data) =>{
 })
 
 app.whenReady().then(() => {
-  tray = new Tray('./assets/baker-min.png')
-  const contextMenu = Menu.buildFromTemplate([
-    { label: 'Minimize',
-        click:  function(){
-            mainWindow.minimize();
-        } 
-    },
-    { label: 'Quit',
-        accelerator: process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q', 
-        click:  function(){
-            app.quit();
+    tray = new Tray('./assets/baker-min.png')
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: 'Minimize',
+            click: function () {
+                mainWindow.minimize();
+            }
+        },
+        {
+            label: 'Quit',
+            accelerator: process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q',
+            click: function () {
+                app.quit();
+            }
         }
-    }
-  ])
-  tray.setToolTip('Toolkit.')
-  //tray.setContextMenu(contextMenu)
-  tray.on('click', () => {
-    mainWindow.show();
-    //mainWindow.setAlwaysOnTop(true);
-  });
+    ])
+    tray.setToolTip('Toolkit.')
+    //tray.setContextMenu(contextMenu)
+    tray.on('click', () => {
+        mainWindow.show();
+        //mainWindow.setAlwaysOnTop(true);
+    });
 })
 //Listen for app to be ready 
-app.on('ready', function() {
+app.on('ready', function () {
     //Create new window
     mainWindow = new BrowserWindow({
         width: 350, // here I have set the width and height
@@ -58,59 +60,69 @@ app.on('ready', function() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
-            preload: path.join(__dirname, 'controllers','preload.js')
+            preload: path.join(__dirname, 'controllers', 'preload.js')
         }
     });
     //Load html into window
     mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'views','main.html'),
+        pathname: path.join(__dirname, 'views', 'main.html'),
         protocol: 'file:',
         slashes: true
     }));
 
     //Build menu form template
-    const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
+    const mainMenu = Menu.buildFromTemplate(template);
     // Insert menu 
-    //Menu.setApplicationMenu(mainMenu)
+    Menu.setApplicationMenu(mainMenu)
 })
 
 //Create menu template 
-const mainMenuTemplate = [
+const template = [
+    // { role: 'appMenu' }
+    ...(process.platform == 'darwin' ? [{
+        label: app.name,
+        submenu: [
+            { role: 'about' },
+            { type: 'separator' },
+            {
+                label: 'preferences',
+                click: () => {
+                    loadPreferences();
+                }
+            },
+            { type: 'separator' },
+            { role: 'quit' }
+        ]
+    }] : []),
     {
-        label:'File',
+        role: 'help',
         submenu: [
             {
-                label: 'Install plugin',
-                click(){
-                    if (process.platform == 'darwin') {
-                        exec('./sh/installPluginMac.sh', (error, stdout, stderr) => {
-                            console.log(stdout.toString());
-                            console.log(stderr);
-                            if (error !== null) {
-                                console.log(`exec error: ${error}`);
-                            }
-                        });
-                    } else {
-                        exec('./sh/installPluginWin.sh', (error, stdout, stderr) => {
-                            console.log(stdout);
-                            console.log(stderr);
-                            if (error !== null) {
-                                console.log(`exec error: ${error}`);
-                            }
-                        });
-                    }
+                label: 'help online',
+                click: async () => {
+                    const { shell } = require('electron')
+                    await shell.openExternal('https://electronjs.org')
                 }
-            },
-            {
-                label: 'Add item'
-            },
-            {
-                label: 'Close',
-                accelerator: process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q',
-                click(){
-                    app.quit();
-                }
-            },
+            }
         ]
-    },
+    }
 ];
+
+const loadPreferences = () => {
+    windowPreferences = new BrowserWindow({
+        parent: mainWindow,
+        modal: true,
+        show: false,
+        width: 400,
+        height: 250
+    });
+    windowPreferences.loadURL(url.format({
+        pathname: path.join(__dirname, 'views', 'preferences.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+    windowPreferences.setMenu(null);
+    windowPreferences.once('ready-to-show', () => {
+        windowPreferences.show();
+    });
+}
