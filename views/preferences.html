@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html lang="en" class="spectrum spectrum--light spectrum--medium">
+  <head>
+    <link rel="stylesheet" href="style.css" />
+    <title>Original Mockups</title>
+  </head>
 
-<head>
-    <link rel="stylesheet" href="style.css">
-    <title>Original Mockups Preferences</title>
-</head>
-
-<body>
-    <h3 class="spectrum-Heading spectrum-Heading--sizeM">Mockup Baker Port</h3>
-        <!-- Photoshop Tools-->
-        <span class="category">General</span>
-        <div class="item">
-            <span class="spectrum-Body spectrum-Body--sizeXS">Port</span>
-            <input class=""/>
-        </div>
-</body>
-
+  <body>
+    <h3 class="spectrum-Heading spectrum-Heading--sizeM">Preferences</h3>
+    <!-- Photoshop Tools-->
+    <span class="category">General</span>
+    <div class="item">
+      <span>Port</span>
+      <div class="spectrum-Switch" onclick="toggleSwitch()">
+        <input type="text" class="spectrum-input" id="input-port" />
+        <span class="spectrum-Text"></span>
+        <button
+          onclick="changePort()"
+          class="spectrum-Button spectrum-Button--fill spectrum-Button--primary spectrum-Button--sizeS buttonInstall"
+        >
+          <span class="spectrum-Button-label font-size-50">Change</span>
+        </button>
+      </div>
+    </div>
+  </body>
 </html>
