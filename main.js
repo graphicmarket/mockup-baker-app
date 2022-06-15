@@ -4,32 +4,89 @@ const path = require('path');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-const {app, BrowserWindow, Menu, ipcMain} = electron;
+const {app, BrowserWindow, Menu, ipcMain, Tray, nativeTheme, dock} = electron;
 
 let mainWindow;
-ipcMain.on("msg", async (event,data) =>{
+let tray = null
+ipcMain.on("installPlugin", async (event,data) =>{
     let result;
     if (process.platform == 'darwin') {
-        let { stdout, stderr } = await exec('./cmd/installPluginMac.sh');
-        result = stdout.split("\n").slice(2).join("\n")
+        let { stdout, stderr } = await exec('./cmd/osx/installPluginMac.sh');
+        result = stdout.match(/[^\r\n]+/g)
     } else {
-        let { stdout, stderr } = await exec('./cmd/installPluginWin.sh');
-        result = stdout.split("\n").slice(2).join("\n")
+        plug_route = path.join(__dirname, 'Plugin', '234a7e6c_PS.ccx')
+        let { stdout, stderr } = await exec('"C:/Program Files/Common Files/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.exe" /install ' + plug_route);
+        result = stdout.match(/[^\r\n]+/g)
     }
-    console.log(result)
-    if (Array.from(result)[0] == 'I') {
+    if(result[1].includes('Installation Successful')){
         event.reply("replyInstallPlugin", true)
-    } else {
+    }else{
         event.reply("replyInstallPlugin", false)
     }
 })
+ipcMain.on("uninstallPlugin", async (event,data) =>{
+    let parseResult;
+    if (process.platform == 'darwin') {
+        let { stdout, stderr } = await exec('./cmd/osx/uninstallPluginMac.sh');
+        parseResult = stdout.match(/[^\r\n]+/g);
+    } else {
+        plug_route = path.join(__dirname, 'Plugin', '234a7e6c_PS.ccx')
+        let { stdout, stderr } = await exec('"C:/Program Files/Common Files/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.exe" /remove "Mockup Baker"');
+        parseResult = stdout.match(/[^\r\n]+/g)
+    }
+    if(parseResult[1].includes('Removal Successful')){
+        event.reply("replyUninstallPlugin", true)
+    }else{
+        event.reply("replyUninstallPlugin", false)
+    }
+})
+ipcMain.on("validatePlugin", async (event,data) =>{
+    let parseResult;
+    if (process.platform == 'darwin') {
+        let { stdout, stderr } = await exec('./cmd/osx/verifyPlugin.sh');
+        parseResult = stdout.match(/[^\r\n]+/g);
+    } else {
+        let { stdout, stderr } = await exec('"C:/Program Files/Common Files/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.exe" /list all');
+        parseResult = stdout.match(/[^\r\n]+/g);
+    }
+    for (let line of parseResult) {
+        if (line.includes("Mockup Baker") && !line.includes("Mockup Baker Assemblers")) {
+            event.reply("replyValidatePlugin", true)
+            return
+        }
+    }
+    event.reply("replyValidatePlugin", false)
+})
+nativeTheme.on('updated', function theThemeHasChanged () {
+    console.log(nativeTheme.shouldUseDarkColors)
+})
 
+app.whenReady().then(() => {
+  tray = new Tray('./assets/baker-tray-icon.png')
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Show App',
+        click:  function(){
+            mainWindow.show();
+        } 
+    },
+    { label: 'Quit',
+        accelerator: process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q', 
+        click:  function(){
+            app.quit();
+        }
+    }
+  ])
+  tray.setToolTip('Toolkit.')
+  tray.setContextMenu(contextMenu)
+})
 //Listen for app to be ready 
 app.on('ready', function() {
+    // app.dock.setIcon('./assets/baker-dock-icon.png')
+    hideFromDock()
     //Create new window
     mainWindow = new BrowserWindow({
         width: 350, // here I have set the width and height
-        height: 450,
+        height: 490,
         resizable: true,
         fullscreenable: false,
         webPreferences: {
@@ -50,6 +107,14 @@ app.on('ready', function() {
     // Insert menu 
     //Menu.setApplicationMenu(mainMenu)
 })
+
+const hideFromDock = async () => {
+    if (process.platform == 'darwin') {
+        app.dock.hide()
+    } else {
+        //Function to windows
+    }
+}
 
 //Create menu template 
 const mainMenuTemplate = [

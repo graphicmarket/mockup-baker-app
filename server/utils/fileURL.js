@@ -1,6 +1,6 @@
 const path = require('path')
 
-function fileURL (filePath, options = {}) {
+const fileURL = (filePath, options = {}) => {
   if (typeof filePath !== 'string') {
     throw new TypeError(`Expected a string, got ${typeof filePath}`)
   }
