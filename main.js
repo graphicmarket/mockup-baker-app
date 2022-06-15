@@ -29,7 +29,7 @@ nativeTheme.on('updated', function theThemeHasChanged () {
 })
 
 app.whenReady().then(() => {
-  tray = new Tray('./assets/baker-menu-bar.png')
+  tray = new Tray('./assets/baker-tray-icon.png')
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Show App',
         click:  function(){
