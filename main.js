@@ -93,7 +93,8 @@ app.on('ready', function() {
             nodeIntegration: true,
             contextIsolation: false,
             preload: path.join(__dirname, 'controllers','preload.js')
-        }
+        },
+        skipTaskbar: true
     });
     //Load html into window
     mainWindow.loadURL(url.format({
