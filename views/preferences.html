@@ -9,18 +9,20 @@
     <h3 class="spectrum-Heading spectrum-Heading--sizeM">Preferences</h3>
     <!-- Photoshop Tools-->
     <span class="category">General</span>
+
     <div class="item">
-      <span>Port</span>
-      <div class="spectrum-Switch" onclick="toggleSwitch()">
-        <input type="text" class="spectrum-input" id="input-port" />
-        <span class="spectrum-Text"></span>
+      <form class="new-port-form">
+        <input type="number" class="spectrum-input" placeholder="Port" />
         <button
-          onclick="changePort()"
-          class="spectrum-Button spectrum-Button--fill spectrum-Button--primary spectrum-Button--sizeS buttonInstall"
+          type="submit"
+          class="spectrum-Button spectrum-Button--fill spectrum-Button--secondary spectrum-Button--sizeS buttonInstall"
         >
-          <span class="spectrum-Button-label font-size-50">Change</span>
+          Change
         </button>
-      </div>
+      </form>
     </div>
+    <script>
+      require('../server/utils/renderPort');
+    </script>
   </body>
 </html>

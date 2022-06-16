@@ -46,7 +46,7 @@ app.whenReady().then(() => {
   //tray.setContextMenu(contextMenu)
   tray.on('click', () => {
     mainWindow.show();
-    //mainWindow.setAlwaysOnTop(true);
+    mainWindow.setAlwaysOnTop(true);
   });
 });
 //Listen for app to be ready
@@ -114,6 +114,7 @@ const template = [
   },
 ];
 
+let windowPreferences = null;
 const loadPreferences = () => {
   windowPreferences = new BrowserWindow({
     parent: mainWindow,
@@ -121,6 +122,12 @@ const loadPreferences = () => {
     show: false,
     width: 400,
     height: 250,
+    resizable: true,
+    fullscreenable: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
   });
   windowPreferences.loadURL(
     url.format({
