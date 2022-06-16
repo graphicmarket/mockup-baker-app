@@ -82,7 +82,6 @@ app.whenReady().then(() => {
 //Listen for app to be ready 
 app.on('ready', function() {
     // app.dock.setIcon('./assets/baker-dock-icon.png')
-    hideFromDock()
     //Create new window
     mainWindow = new BrowserWindow({
         width: 350, // here I have set the width and height
@@ -94,8 +93,8 @@ app.on('ready', function() {
             contextIsolation: false,
             preload: path.join(__dirname, 'controllers','preload.js')
         },
-        skipTaskbar: true
     });
+    hideFromDock()
     //Load html into window
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'views','main.html'),
@@ -113,7 +112,7 @@ const hideFromDock = async () => {
     if (process.platform == 'darwin') {
         app.dock.hide()
     } else {
-        //Function to windows
+        mainWindow.setSkipTaskbar(true)
     }
 }
 
