@@ -2,12 +2,25 @@ const electron = require('electron');
 const url = require('url');
 const path = require('path');
 const util = require('util');
+const { MenuItem } = require('electron');
 const exec = util.promisify(require('child_process').exec);
 
 const {app, BrowserWindow, Menu, ipcMain, Tray, nativeTheme, dock} = electron;
 
 let mainWindow;
-let tray = null
+let tray = null;
+let menuFLoat = new Menu();
+
+ipcMain.on("showFloatMenu", async (event,data) =>{
+    menuFLoat.popup(mainWindow)
+})
+ipcMain.on("closePreferences", async (event,data) =>{
+    mainWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'views','home','main.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+})
 ipcMain.on("installPlugin", async (event,data) =>{
     let result;
     if (process.platform == 'darwin') {
@@ -94,10 +107,10 @@ app.on('ready', function() {
             preload: path.join(__dirname, 'controllers','preload.js')
         },
     });
-    hideFromDock()
+    //hideFromDock()
     //Load html into window
     mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'views','main.html'),
+        pathname: path.join(__dirname, 'views','home','main.html'),
         protocol: 'file:',
         slashes: true
     }));
@@ -106,6 +119,41 @@ app.on('ready', function() {
     const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
     // Insert menu 
     //Menu.setApplicationMenu(mainMenu)
+
+    menuFLoat.append(new MenuItem({
+        label:'File',
+        submenu: [
+            {
+                label: 'Preferences',
+            },
+            {
+                label: 'Close',
+                accelerator: process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q',
+                click(){
+                    app.quit();
+                }
+            },
+        ]
+    }))
+    menuFLoat.append(new MenuItem({
+        label:'Preferences',
+        accelerator: process.platform == 'darwin' ? 'Command+K' : 'Ctrl+K',
+        click(){
+            mainWindow.loadURL(url.format({
+                pathname: path.join(__dirname, 'views','preferences','preferences.html'),
+                protocol: 'file:',
+                slashes: true
+            }));
+        }
+    }))
+    menuFLoat.append(new MenuItem({
+        label: 'Close',
+        accelerator: process.platform == 'darwin' ? 'Command+Q' : 'Ctrl+Q',
+        click(){
+            app.quit();
+        }
+    }))
+
 })
 
 const hideFromDock = async () => {
@@ -144,7 +192,14 @@ const mainMenuTemplate = [
                 }
             },
             {
-                label: 'Add item'
+                label: 'Preferences',
+                click(){
+                    mainWindow.loadURL(url.format({
+                        pathname: path.join(__dirname, 'views','preferences','preferences.html'),
+                        protocol: 'file:',
+                        slashes: true
+                    }));
+                }
             },
             {
                 label: 'Close',

@@ -77,7 +77,7 @@ function uninstallPlugin(){
 
 async function toggleServer(status){
     const {ipcRenderer} = require('electron');
-    const { serverStatus } = require('../server/server')
+    const { serverStatus } = require('../../server/server')
     let result = await serverStatus({server: status})
     if(result){
         if(status){
@@ -101,6 +101,11 @@ async function toggleServer(status){
 
 function hideElement(el){
     el.style.display = 'none'
+}
+
+function showFloatMenu() {
+    const {ipcRenderer} = require('electron')
+    ipcRenderer.send("showFloatMenu",true)
 }
 
   
