@@ -76,7 +76,6 @@ function uninstallPlugin(){
 }
 
 async function toggleServer(status){
-    const {ipcRenderer} = require('electron');
     const { serverStatus } = require('../../server/server')
     let result = await serverStatus({server: status})
     if(result){

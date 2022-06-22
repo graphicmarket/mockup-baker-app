@@ -7,27 +7,31 @@ const puppeteer = require('puppeteer')
 const { fileURL } = require('./utils/fileURL')
 const resizeRender = require('./utils/resizeRender');
 
+const log = require('electron-log');
+log.transports.file.resolvePath = () => path.join(__dirname,'..','log.js');
+
 //Config server
 const server = express();
 server.use(express.json({limit: '10gb'}))
 server.use(express.static(join(__dirname, 'public')))
 server.use(express.urlencoded({ limit: '100mb', extended: true }))
 server.use(express.static(join(__dirname, 'mockups')))
+server.use(express.static(join(__dirname, 'Plugin')))
 
 var serverListener = undefined
 let port = '8008'
 
 async function serverStatus(data) {
-    console.log('received', data)
-
     try{
         if (data.server) {
             serverListener = await server.listen(port, () => {
                 console.log(`Example app listening on port ${port}`)
+                log.info(`Example app listening on port ${port}`)
             });
         } else {
             serverListener.close(() => {
                 console.log('Closed out remaining connections');
+                log.info('Closed out remaining connections');
             });
         }
         return true
@@ -37,6 +41,19 @@ async function serverStatus(data) {
 }
 server.get('/collada',function(req,res) {
     res.sendFile(path.resolve(__dirname, 'mockups', 'collada.dae'));
+});
+server.get('/colladaPath',function(req,res) {
+    res.send(path.resolve(__dirname, 'mockups', 'collada.dae'));
+});
+server.get('/plugin',function(req,res) {
+    res.sendFile(path.resolve(__dirname, '..','Plugin', '234a7e6c_PS.ccx'))
+});
+server.get('/pluginPath',function(req,res) {
+    res.send(path.resolve(__dirname, '..','Plugin', '234a7e6c_PS.ccx'))
+});
+server.get('/log',function(req,res) {
+    log.info('Exporting log')
+    res.sendFile(path.resolve(__dirname, '..','log.js'))
 });
 server.post('/render', async (req, res) => {
     const { body } = req;
@@ -57,7 +74,10 @@ server.post('/render', async (req, res) => {
                 res.status(400).send()
             }
         } catch (error) {
-            console.log('in calling function')
+            log.warn('in calling function', error)
+            res.json({
+                error: error.message
+            })
             res.status(400).send()
         }
     }
@@ -67,9 +87,9 @@ server.post('/render', async (req, res) => {
 async function renderProcess({ camera, folder, scene, targetMaterialName, texture, finalFrameWidth, finalFrameHeight, colladaEncrypt, webGl }) {
     try {
         //Write collada
-        await fs.writeFile(`./server/mockups/collada.dae`, Buffer.from(colladaEncrypt), (err) => {
-            if (err) {throw new Error (err.message)}
-        });
+        // await fs.writeFile(`./server/mockups/collada.dae`, Buffer.from(colladaEncrypt), (err) => {
+        //     if (err) {throw new Error (err.message)}
+        // });
 
 
         const itemData = {
@@ -117,8 +137,8 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
         return base64.toString('base64')
 
     } catch (error) {
-        console.log('Throwing...', error.code, error.message)
-        throw new Error()
+        log.error('Throwing...',  error.message)
+        throw new Error(error)
     }
 }
 
