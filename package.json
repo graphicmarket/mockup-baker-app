@@ -34,16 +34,21 @@
   "build": {
     "appId": "com.electron.builder.graphic.market",
     "productName": "Mockup Baker",
-    "extends": null,
-    "icon": "assets/baker-dock-icon.png",
-    "extraResources": [
-      "./assets/**"
-    ],
+    "mac": {
+      "category": "public.app-category.graphics-design",
+      "target": "dmg",
+      "icon": "assets/baker-dock-icon.png"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/baker-dock-icon.ico"
+    },
     "files": [
-      "server/**",
+      "server/**/*",
       "main.js",
-      "Plugin/**",
-      "log.js"
+      "Plugin/**/*",
+      "log.js",
+      "package.json"
     ]
   }
 }

@@ -42,6 +42,11 @@ async function serverStatus(data) {
 server.get('/collada',function(req,res) {
     res.sendFile(path.resolve(__dirname, 'mockups', 'collada.dae'));
 });
+
+server.get('/renderfile',function(req,res) {
+    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+});
+
 server.get('/colladaPath',function(req,res) {
     res.send(path.resolve(__dirname, 'mockups', 'collada.dae'));
 });
@@ -87,9 +92,9 @@ server.post('/render', async (req, res) => {
 async function renderProcess({ camera, folder, scene, targetMaterialName, texture, finalFrameWidth, finalFrameHeight, colladaEncrypt, webGl }) {
     try {
         //Write collada
-        // await fs.writeFile(`./server/mockups/collada.dae`, Buffer.from(colladaEncrypt), (err) => {
-        //     if (err) {throw new Error (err.message)}
-        // });
+        //await fs.writeFile(path.resolve(__dirname, 'mockups', 'collada.dae'), Buffer.from(colladaEncrypt), (err) => {
+        //    if (err) {throw new Error (err.message)}
+        //});
 
 
         const itemData = {
@@ -115,7 +120,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
             resolve: false
         })
 
-        await page.goto(index, { waitUntil: 'networkidle0' })
+        await page.goto('http://127.0.0.1:8008/renderfile', { waitUntil: 'networkidle0' })
         await page.evaluateHandle(async (itemData) => {
             return await window.renderScene(itemData)
         }, itemData)
@@ -135,7 +140,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
             base64 = await resizeRender(base64, camera.finalFrameWidth, camera.finalFrameHeight);
         }
         return base64.toString('base64')
-
+        
     } catch (error) {
         log.error('Throwing...',  error.message)
         throw new Error(error)
