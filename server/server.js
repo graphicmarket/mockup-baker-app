@@ -6,6 +6,7 @@ const express = require('express');
 const puppeteer = require('puppeteer')
 const { fileURL } = require('./utils/fileURL')
 const resizeRender = require('./utils/resizeRender');
+const electron = require("electron");
 
 const log = require('electron-log');
 log.transports.file.resolvePath = () => path.join(__dirname,'..','log.js');
@@ -20,6 +21,9 @@ server.use(express.static(join(__dirname, 'Plugin')))
 
 var serverListener = undefined
 let port = '8008'
+
+const { app } = electron;
+const configfile = path.join(app.getPath("temp"), "collada.dae");
 
 async function serverStatus(data) {
     try{
@@ -40,7 +44,7 @@ async function serverStatus(data) {
     }
 }
 server.get('/collada',function(req,res) {
-    res.sendFile(path.resolve(__dirname, 'mockups', 'collada.dae'));
+    res.sendFile(configfile);
 });
 
 server.get('/renderfile',function(req,res) {
@@ -48,7 +52,7 @@ server.get('/renderfile',function(req,res) {
 });
 
 server.get('/colladaPath',function(req,res) {
-    res.send(path.resolve(__dirname, 'mockups', 'collada.dae'));
+    res.send(configfile);
 });
 server.get('/plugin',function(req,res) {
     res.sendFile(path.resolve(__dirname, '..','Plugin', '234a7e6c_PS.ccx'))
@@ -63,6 +67,7 @@ server.get('/log',function(req,res) {
 server.post('/render', async (req, res) => {
     const { body } = req;
     // let response = false
+    
     if (body.folder === '' || body.folder === undefined) {
         res.setHeader('Content-Type', 'Response')
         res.status(400).send()
@@ -92,10 +97,9 @@ server.post('/render', async (req, res) => {
 async function renderProcess({ camera, folder, scene, targetMaterialName, texture, finalFrameWidth, finalFrameHeight, colladaEncrypt, webGl }) {
     try {
         //Write collada
-        await fs.writeFile(path.resolve(__dirname, 'mockups', 'collada.dae'), Buffer.from(colladaEncrypt), (err) => {
-           if (err) {throw new Error (err.message)}
+        await fs.writeFile(configfile, Buffer.from(colladaEncrypt), (err) => {
+            if (err) {throw new Error (err.message)}
         });
-
 
         const itemData = {
             sceneFileURL: 'http://127.0.0.1:8008/collada',
@@ -112,7 +116,8 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
                 '--disable-site-isolation-trials',
                 "--enable-webgl",
                 "--use-gl=angle"
-            ]
+            ],
+            //executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
         })
 
         const page = await browser.newPage()
@@ -133,14 +138,14 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
         base64 = data.split(';base64,')[1]
         await browser.close();
         //Remove collada
-        // await fs.unlink('./mockups/collada.dae', (err) => {
-        //     if (err) {throw err;}
-        // });
+        /*await fs.unlink((app.getAppPath() + "./mockups/collada.dae"), (err) => {
+            if (err) {throw err;}
+        });*/
+        
         if( camera.finalFrameWidth !== camera.frameWidth && camera.finalFrameHeight !== camera.frameHeight) {
             base64 = await resizeRender(base64, camera.finalFrameWidth, camera.finalFrameHeight);
         }
         return base64.toString('base64')
-        
     } catch (error) {
         log.error('Throwing...',  error.message)
         throw new Error(error)
