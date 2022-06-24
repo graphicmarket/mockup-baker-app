@@ -33,3 +33,5 @@
   'Installing extension with file path = /Users/cesarpenahernandez/Documents/GitHub/toolkit/Plugin/234a7e6c_PS.ccx',
   'Installation Successful for extension with file path = /Users/cesarpenahernandez/Documents/GitHub/toolkit/Plugin/234a7e6c_PS.ccx'
 ]
+[2022-06-24 16:41:06.610] [info]  Example app listening on port 8008
+[2022-06-24 17:35:17.011] [info]  Example app listening on port 8008

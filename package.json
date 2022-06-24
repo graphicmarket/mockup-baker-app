@@ -37,7 +37,8 @@
     "mac": {
       "category": "public.app-category.graphics-design",
       "target": "dmg",
-      "icon": "assets/baker-dock-icon.png"
+      "icon": "assets/baker-dock-icon.png",
+      "asar": false
     },
     "win": {
       "target": "nsis",

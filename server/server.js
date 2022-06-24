@@ -92,9 +92,9 @@ server.post('/render', async (req, res) => {
 async function renderProcess({ camera, folder, scene, targetMaterialName, texture, finalFrameWidth, finalFrameHeight, colladaEncrypt, webGl }) {
     try {
         //Write collada
-        //await fs.writeFile(path.resolve(__dirname, 'mockups', 'collada.dae'), Buffer.from(colladaEncrypt), (err) => {
-        //    if (err) {throw new Error (err.message)}
-        //});
+        await fs.writeFile(path.resolve(__dirname, 'mockups', 'collada.dae'), Buffer.from(colladaEncrypt), (err) => {
+           if (err) {throw new Error (err.message)}
+        });
 
 
         const itemData = {
