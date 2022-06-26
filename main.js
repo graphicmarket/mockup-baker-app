@@ -6,6 +6,7 @@ const fs = require('fs');
 const exec = util.promisify(require("child_process").exec);
 const { serverStatus } = require("./server/server");
 const log = require("electron-log");
+const { autoUpdater } = require('electron-updater');
 log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"log.js");
 
 const {
@@ -244,6 +245,14 @@ let menuTrayTemplate = [
     },
   },
   {
+    label: "Check for updates",
+    id: "updates",
+    enabled: false,
+    click: function () {
+      autoUpdater.checkForUpdates();
+    },
+  },
+  {
     label: "Preferences",
     id: "preferences",
     enabled: false,
@@ -372,3 +381,52 @@ const deleteFolder = async () => {
     let configfile = path.join(app.getPath("temp"), "originalMockups");
     fs.rmSync(configfile, { recursive: true, force: true });
 }
+//Updates 
+autoUpdater.on("update-available", (_event, releasesNotes, releaseName) =>{
+  const dialogOpts = {
+      type: "info",
+      buttons: ['Ok'],
+      title: "Application Update",
+      message: "Notas de versión",
+      detail: "A new version is being downloaded."
+  }
+
+  dialog.showMessageBox(dialogOpts, (response) => {});
+})
+autoUpdater.on("update-not-available", (info) => {
+  const dialogOpts = {
+      type: 'info',
+      buttons: ['Ok'],
+      title: 'Application already update',
+      message: "Yay",
+      detail: 'No new updates.'
+    }
+    dialog.showMessageBox(dialogOpts, (response) => {
+
+    });
+});
+autoUpdater.on("update-downloaded", (_event, releasesNotes, releaseName) => {
+  const dialogOpts = {
+      type: "info",
+      buttons: ['Restart', 'Later'],
+      title: "Application Update",
+      message: "Notas de versión",
+      detail: "Restart the application."
+  }
+  
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+      if(returnValue.response === 0) autoUpdater.quitAndInstall();
+  });
+})
+
+autoUpdater.on('error', (message) => {
+  const dialogOpts = {
+      type: "info",
+      buttons: [':('],
+      title: "Error",
+      message: "Error",
+      detail: message.message
+  }
+  
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {});
+})
