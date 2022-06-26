@@ -1,11 +1,12 @@
 {
   "name": "toolkit",
   "version": "1.0.0",
-  "description": "Test electron app",
+  "description": "Mockup Baker app",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder",
+    "dist-all": "electron-builder --mac --win",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null"
   },
   "author": "@cesarphernandez",
@@ -33,7 +34,8 @@
   },
   "build": {
     "appId": "com.electron.builder.graphic.market",
-    "productName": "Mockup Baker",
+    "productName": "MockupBaker",
+    "artifactName": "MockupBaker-${version}.${ext}",
     "mac": {
       "category": "public.app-category.graphics-design",
       "target": "dmg",
@@ -44,10 +46,13 @@
       "target": "nsis",
       "icon": "assets/baker-dock-icon.ico"
     },
+    "extraResources": [
+      "./assets/**",
+      "./Plugin/**"
+    ],
     "files": [
       "server/**/*",
       "main.js",
-      "Plugin/**/*",
       "log.js",
       "package.json"
     ]

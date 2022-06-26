@@ -9,7 +9,7 @@ const resizeRender = require('./utils/resizeRender');
 const electron = require("electron");
 
 const log = require('electron-log');
-log.transports.file.resolvePath = () => path.join(__dirname,'..','log.js');
+log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"log.js");
 
 //Config server
 const server = express();
@@ -23,7 +23,7 @@ var serverListener = undefined
 let port = '8008'
 
 const { app } = electron;
-const configfile = path.join(app.getPath("temp"), "collada.dae");
+const configfile = path.join(app.getPath("temp"), "originalMockups","collada.dae");
 
 async function serverStatus(data) {
     try{
@@ -46,19 +46,17 @@ async function serverStatus(data) {
 server.get('/collada',function(req,res) {
     res.sendFile(configfile);
 });
-
 server.get('/renderfile',function(req,res) {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
-
 server.get('/colladaPath',function(req,res) {
     res.send(configfile);
 });
 server.get('/plugin',function(req,res) {
-    res.sendFile(path.resolve(__dirname, '..','Plugin', '234a7e6c_PS.ccx'))
+    res.sendFile(path.join(process.resourcesPath, "Plugin","234a7e6c_PS.ccx"))
 });
 server.get('/pluginPath',function(req,res) {
-    res.send(path.resolve(__dirname, '..','Plugin', '234a7e6c_PS.ccx'))
+    res.send(path.join(process.resourcesPath, "Plugin","234a7e6c_PS.ccx"))
 });
 server.get('/log',function(req,res) {
     log.info('Exporting log')
@@ -66,7 +64,6 @@ server.get('/log',function(req,res) {
 });
 server.post('/render', async (req, res) => {
     const { body } = req;
-    // let response = false
     
     if (body.folder === '' || body.folder === undefined) {
         res.setHeader('Content-Type', 'Response')

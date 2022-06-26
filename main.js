@@ -2,11 +2,11 @@ const electron = require("electron");
 const url = require("url");
 const path = require("path");
 const util = require("util");
-const { MenuItem } = require("electron");
+const fs = require('fs');
 const exec = util.promisify(require("child_process").exec);
 const { serverStatus } = require("./server/server");
-const log = require('electron-log');
-log.transports.file.resolvePath = () => path.join(__dirname,'log.js');
+const log = require("electron-log");
+log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"log.js");
 
 const {
   app,
@@ -66,7 +66,6 @@ ipcMain.on("uninstallPlugin", async (event, data) => {
     let { stdout, stderr } = await exec("./cmd/osx/uninstallPluginMac.sh");
     parseResult = stdout.match(/[^\r\n]+/g);
   } else {
-    plug_route = path.join(__dirname, "Plugin", "234a7e6c_PS.ccx");
     let { stdout, stderr } = await exec(
       '"C:/Program Files/Common Files/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.exe" /remove "Mockup Baker"'
     );
@@ -106,19 +105,20 @@ ipcMain.on("validatePlugin", async (event, data) => {
   await serverStatus({ server: false });
 });
 
-
 app.whenReady().then(async () => {
-    try {
-        console.log(app.getAppPath())
-        tray = new Tray(nativeImage.createFromPath(await validateThemeIcon()).resize({ width: 16 }));
-        tray.setToolTip("Mocukp Baker App");
-        tray.setContextMenu(Menu.buildFromTemplate(menuTrayTemplate));
-    } catch (error) {
-        log.error(error)
-    }
-        
+  try {
+    tray = new Tray(
+      nativeImage
+        .createFromPath(await validateThemeIcon())
+        .resize({ width: 16 })
+    );
+    tray.setToolTip("Mockup Baker App");
+    tray.setContextMenu(Menu.buildFromTemplate(menuTrayTemplate));
+  } catch (error) {
+    log.error(error);
+  }
 });
-app.on("ready", function () {
+app.on("ready", async function () {
   //Create new window
   // mainWindow = new BrowserWindow({
   //     width: 350, // here I have set the width and height
@@ -131,9 +131,10 @@ app.on("ready", function () {
   //         preload: path.join(__dirname, 'controllers','preload.js')
   //     },
   // });
-  validatePlugin();
+  await createFolder();
+  await validatePlugin();
   //mainWindow.webContents.openDevTools({ mode: 'detach' });
-  hideFromDock();
+  await hideFromDock();
   //Load html into window
   // mainWindow.loadURL(url.format({
   //     pathname: path.join(__dirname, 'views','home','main.html'),
@@ -143,15 +144,19 @@ app.on("ready", function () {
 });
 
 //Update Theme
-nativeTheme.on("updated", function theThemeHasChanged() {
-    if (nativeTheme.shouldUseDarkColors) {
-      trayImage = path.join(__dirname, `assets/baker-tray-icon-light.png`);
-      tray.setImage(trayImage);
-    } else {
-      trayImage = path.join("assets", "baker-tray-icon.png");
-      tray.setImage(trayImage);
-    }
-  });
+nativeTheme.on("updated", () => {
+  if (nativeTheme.shouldUseDarkColors) {
+    trayImage = app.isPackaged
+    ? path.join(process.resourcesPath, "assets","baker-tray-icon-light.png")
+    : path.join(__dirname, `assets/baker-tray-icon-light.png`);
+    tray.setImage(trayImage);
+  } else {
+    trayImage = app.isPackaged
+    ? path.join(process.resourcesPath,"assets","baker-tray-icon.png")
+    : path.join(__dirname, `assets/baker-tray-icon.png`);
+    tray.setImage(trayImage);
+  }
+});
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
@@ -160,7 +165,7 @@ app.on("window-all-closed", () => {
 const changeMenu = async (event) => {
   switch (event) {
     case "server-on":
-      status.plugin = "toUninstall";
+      status.plugin = true;
       status.server = true;
       menuTrayTemplate.find((item) => item.id == "server").label =
         "Stop Server";
@@ -168,7 +173,7 @@ const changeMenu = async (event) => {
         "Uninstall Plugin";
       break;
     case "server-off":
-      status.plugin = "toInstall";
+      status.plugin = false;
       status.server = false;
       menuTrayTemplate.find((item) => item.id == "server").label =
         "Start Server";
@@ -178,7 +183,6 @@ const changeMenu = async (event) => {
   }
   tray.setContextMenu(Menu.buildFromTemplate(menuTrayTemplate));
 };
-
 const hideFromDock = async () => {
   if (process.platform == "darwin") {
     app.dock.hide();
@@ -186,14 +190,24 @@ const hideFromDock = async () => {
     mainWindow.setSkipTaskbar(true);
   }
 };
-
-
-
 let menuTrayTemplate = [
   {
     label: "About Mockup Baker..",
+    enabled: false,
     icon: nativeImage
-      .createFromPath(__dirname + "/assets/baker-tray-icon.png")
+      .createFromPath(
+        nativeTheme.shouldUseDarkColors
+          ? app.isPackaged
+            ? path.join(
+                process.resourcesPath,
+                "assets",
+                "baker-tray-icon-light.png"
+              )
+            : path.join(__dirname, `assets/baker-tray-icon-light.png`)
+          : app.isPackaged
+          ? path.join(process.resourcesPath, "assets", "baker-tray-icon.png")
+          : path.join(__dirname, `assets/baker-tray-icon.png`)
+      )
       .resize({ width: 16 }),
     click: function () {},
   },
@@ -204,7 +218,8 @@ let menuTrayTemplate = [
     label: "Install Plugin",
     id: "plugin",
     click: function () {
-      if (status.plugin == "toInstall") {
+      log.info(status.plugin);
+      if (status.plugin == false) {
         installPlugin();
       } else {
         uninstallPlugin();
@@ -231,18 +246,19 @@ let menuTrayTemplate = [
   {
     label: "Preferences",
     id: "preferences",
+    enabled: false,
     accelerator: process.platform == "darwin" ? "Command+," : "Ctrl+Q",
     click: function () {},
   },
   {
     label: "Quit",
     accelerator: process.platform == "darwin" ? "Command+Q" : "Ctrl+Q",
-    click: function () {
+    click: async function () {
+      await deleteFolder()
       app.quit();
     },
   },
 ];
-
 const validatePlugin = async () => {
   let parseResult;
   if (process.platform == "darwin") {
@@ -270,31 +286,40 @@ const validatePlugin = async () => {
   await serverStatus({ server: false });
 };
 const installPlugin = async () => {
-    try {
-        let result;
-        plug_route = path.join(__dirname, "Plugin", "234a7e6c_PS.ccx");
-        if (process.platform == "darwin") {
-          let { stdout, stderr } = await exec(
-            '"/Library/Application Support/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.app/Contents/MacOS/UnifiedPluginInstallerAgent" --install ' +
-              plug_route
-          );
-          result = stdout.match(/[^\r\n]+/g);
-        } else {
-          let { stdout, stderr } = await exec(
-            '"C:/Program Files/Common Files/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.exe" /install ' +
-              plug_route
-          );
-          result = stdout.match(/[^\r\n]+/g);
-        }
-        log.info("Plugin",result)
-        if (result[1].includes("Installation Successful")) {
-          changeMenu("server-on");
-          if (!status.server) await serverStatus({ server: true });
-        } else {
-        }
-    } catch (error) {
-        log.error(error)
+  try {
+    let result;
+    let plug_route = app.isPackaged
+        ? path.join(process.resourcesPath, "Plugin","234a7e6c_PS.ccx")
+        : path.join(__dirname, "Plugin", "234a7e6c_PS.ccx");
+    let plug_dest = path.join(app.getPath("temp"), "originalMockups","234a7e6c_PS.ccx")
+    fs.copyFile(plug_route, plug_dest, (err) => {
+        if (err) throw err;
+        console.log('source.txt was copied to destination.txt');
+        });
+    log.info(plug_route)
+    if (process.platform == "darwin") {
+      let { stdout, stderr } = await exec(
+        '"/Library/Application Support/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.app/Contents/MacOS/UnifiedPluginInstallerAgent" --install ' +
+        plug_dest
+      );
+      result = stdout.match(/[^\r\n]+/g);
+    } else {
+      let { stdout, stderr } = await exec(
+        '"C:/Program Files/Common Files/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.exe" /install ' +
+        plug_dest
+      );
+      result = stdout.match(/[^\r\n]+/g);
     }
+    log.info(result)
+    if (result[1].includes("Installation Successful")) {
+      fs.unlinkSync(plug_dest)
+      if (!status.server) {await serverStatus({ server: true })}
+      changeMenu("server-on");
+    } else {
+    }
+  } catch (error) {
+    log.error(error);
+  }
 };
 const uninstallPlugin = async () => {
   let parseResult;
@@ -327,9 +352,23 @@ const changeServer = async (statusServer) => {
   changeMenu();
 };
 const validateThemeIcon = async () => {
-    if (nativeTheme.shouldUseDarkColors) {
-      return path.join(__dirname, `assets/baker-tray-icon-light.png`);
-    } else {
-      return path.join(__dirname, `assets/baker-tray-icon.png`);
+  if (nativeTheme.shouldUseDarkColors) {
+    return app.isPackaged
+      ? path.join(process.resourcesPath, "assets","baker-tray-icon-light.png")
+      : path.join(__dirname, `assets/baker-tray-icon-light.png`);
+  } else {
+    return app.isPackaged
+      ? path.join(process.resourcesPath,"assets","baker-tray-icon.png")
+      : path.join(__dirname, `assets/baker-tray-icon.png`);
+  }
+};
+const createFolder = async () => {
+    let configfile = path.join(app.getPath("temp"), "originalMockups");
+    if (!fs.existsSync(configfile)){
+        await fs.mkdirSync(configfile);
     }
+}
+const deleteFolder = async () => {
+    let configfile = path.join(app.getPath("temp"), "originalMockups");
+    fs.rmSync(configfile, { recursive: true, force: true });
 }
