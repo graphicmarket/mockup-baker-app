@@ -7,6 +7,7 @@ const exec = util.promisify(require("child_process").exec);
 const { serverStatus } = require("./server/server");
 const log = require("electron-log");
 const { autoUpdater } = require('electron-updater');
+const isDev = require("electron-is-dev");
 log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"log.js");
 
 const {
@@ -142,6 +143,10 @@ app.on("ready", async function () {
   //     protocol: 'file:',
   //     slashes: true
   // }));
+  if(!isDev){
+    console.log('not in dev')
+    autoUpdater.checkForUpdates();
+  }
 });
 
 //Update Theme
@@ -393,18 +398,18 @@ autoUpdater.on("update-available", (_event, releasesNotes, releaseName) =>{
 
   dialog.showMessageBox(dialogOpts, (response) => {});
 })
-autoUpdater.on("update-not-available", (info) => {
-  const dialogOpts = {
-      type: 'info',
-      buttons: ['Ok'],
-      title: 'Application already update',
-      message: "Yay",
-      detail: 'No new updates.'
-    }
-    dialog.showMessageBox(dialogOpts, (response) => {
+// autoUpdater.on("update-not-available", (info) => {
+//   const dialogOpts = {
+//       type: 'info',
+//       buttons: ['Ok'],
+//       title: 'Application already update',
+//       message: "Yay",
+//       detail: 'No new updates.'
+//     }
+//     dialog.showMessageBox(dialogOpts, (response) => {
 
-    });
-});
+//     });
+// });
 autoUpdater.on("update-downloaded", (_event, releasesNotes, releaseName) => {
   const dialogOpts = {
       type: "info",
