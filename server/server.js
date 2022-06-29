@@ -9,7 +9,7 @@ const resizeRender = require('./utils/resizeRender');
 const electron = require("electron");
 
 const log = require('electron-log');
-log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"log.js");
+log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"OM.log");
 
 //Config server
 const server = express();
@@ -23,18 +23,16 @@ var serverListener = undefined
 let port = '8008'
 
 const { app } = electron;
-const configfile = path.join(app.getPath("temp"), "originalMockups","collada.dae");
+let configfile = path.join(app.getPath("temp"), "originalMockups");
 
 async function serverStatus(data) {
     try{
         if (data.server) {
             serverListener = await server.listen(port, () => {
-                console.log(`Example app listening on port ${port}`)
                 log.info(`Example app listening on port ${port}`)
             });
         } else {
             serverListener.close(() => {
-                console.log('Closed out remaining connections');
                 log.info('Closed out remaining connections');
             });
         }
@@ -52,19 +50,12 @@ server.get('/renderfile',function(req,res) {
 server.get('/colladaPath',function(req,res) {
     res.send(configfile);
 });
-server.get('/plugin',function(req,res) {
-    res.sendFile(path.join(process.resourcesPath, "Plugin","234a7e6c_PS.ccx"))
-});
 server.get('/pluginPath',function(req,res) {
     res.send(path.join(process.resourcesPath, "Plugin","234a7e6c_PS.ccx"))
 });
-server.get('/log',function(req,res) {
-    log.info('Exporting log')
-    res.sendFile(path.resolve(__dirname, '..','log.js'))
-});
 server.post('/render', async (req, res) => {
     const { body } = req;
-    
+    configfile = path.join(app.getPath("temp"), "originalMockups");
     if (body.folder === '' || body.folder === undefined) {
         res.setHeader('Content-Type', 'Response')
         res.status(400).send()
@@ -94,10 +85,12 @@ server.post('/render', async (req, res) => {
 async function renderProcess({ camera, folder, scene, targetMaterialName, texture, finalFrameWidth, finalFrameHeight, colladaEncrypt, webGl }) {
     try {
         //Write collada
-        await fs.writeFile(configfile, Buffer.from(colladaEncrypt), (err) => {
-            if (err) {throw new Error (err.message)}
-        });
-
+        configfile += `/${folder}.dae`
+        if (!fs.existsSync(configfile)) {
+            await fs.writeFile(configfile, Buffer.from(colladaEncrypt), (err) => {
+                if (err) {throw new Error (err.message)}
+            });
+        }
         const itemData = {
             sceneFileURL: 'http://127.0.0.1:8008/collada',
             texture,
