@@ -122,8 +122,6 @@ const validateAplicactionFolder = async () => {
 const hideFromDock = async () => {
   if (process.platform == "darwin") {
     app.dock.hide();
-  } else {
-    mainWindow.setSkipTaskbar(true);
   }
 };
 const initialTrayIcons = async () => {
