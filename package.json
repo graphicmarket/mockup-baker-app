@@ -1,13 +1,15 @@
 {
   "name": "toolkit",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Mockup Baker app",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder",
     "dist-all": "electron-builder --mac --win",
-    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null"
+    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
+    "build:win": "set GH_TOKEN=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 && electron-builder --win --publish always",
+    "build:mac": "export GH_TOKEN=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 && electron-builder --mac --publish always"
   },
   "author": "@cesarphernandez",
   "license": "MIT",
@@ -24,8 +26,9 @@
     "electron-log": "^4.4.7",
     "express": "^4.18.1",
     "puppeteer": "^14.3.0",
-    "sharp": "^0.30.6",
-    "source-map-support": "^0.5.16"
+    "sharp": "^0.30.7",
+    "source-map-support": "^0.5.16",
+    "electron-updater": "^5.0.5"
   },
   "devDependencies": {
     "electron": "^19.0.4",
@@ -40,11 +43,17 @@
       "category": "public.app-category.graphics-design",
       "target": "dmg",
       "icon": "assets/baker-dock-icon.png",
-      "asar": false
+      "asar": false,
+      "publish": [
+        "github"
+      ]
     },
     "win": {
       "target": "nsis",
-      "icon": "assets/baker-dock-icon.ico"
+      "icon": "assets/baker-dock-icon.ico",
+      "publish": [
+        "github"
+      ]
     },
     "extraResources": [
       "./assets/**",
