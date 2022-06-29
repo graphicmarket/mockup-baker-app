@@ -69,6 +69,7 @@ nativeTheme.on("updated", async () => {
     trayImage = await getNativeIcon('baker-tray-icon')
     tray.setImage(trayImage);
     await changeAtributteMenu('plugin','','baker-tray-menu-install-plugin')
+    await changeAtributteMenu('server','',`baker-try-menu-server-${status.server ? 'start' : 'stop'}`)
     await changeAtributteMenu('about','','baker-tray-icon')
     changeMenu()
   } catch (error) {
