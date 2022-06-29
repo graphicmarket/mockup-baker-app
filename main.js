@@ -9,6 +9,8 @@ const log = require("electron-log");
 const { autoUpdater } = require('electron-updater');
 const { install } = require("source-map-support");
 log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"OM.log");
+const isDev = require("electron-is-dev");
+log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"log.js");
 
 const {
   app,
@@ -55,6 +57,9 @@ app.on("ready", async function () {
   await initialTrayIcons();
   await validatePlugin();
   await hideFromDock();
+  if(app.isPackaged){
+    autoUpdater.checkForUpdates();
+  }
 });
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -312,18 +317,18 @@ autoUpdater.on("update-available", (_event, releasesNotes, releaseName) =>{
 
   dialog.showMessageBox(dialogOpts, (response) => {});
 })
-autoUpdater.on("update-not-available", (info) => {
-  const dialogOpts = {
-      type: 'info',
-      buttons: ['Ok'],
-      title: 'Application already update',
-      message: "Yay",
-      detail: 'No new updates.'
-    }
-    dialog.showMessageBox(dialogOpts, (response) => {
+// autoUpdater.on("update-not-available", (info) => {
+//   const dialogOpts = {
+//       type: 'info',
+//       buttons: ['Ok'],
+//       title: 'Application already update',
+//       message: "Yay",
+//       detail: 'No new updates.'
+//     }
+//     dialog.showMessageBox(dialogOpts, (response) => {
 
-    });
-});
+//     });
+// });
 autoUpdater.on("update-downloaded", (_event, releasesNotes, releaseName) => {
   const dialogOpts = {
       type: "info",

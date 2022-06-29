@@ -7,7 +7,8 @@
     "start": "electron .",
     "dist": "electron-builder",
     "dist-all": "electron-builder --mac --win",
-    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null"
+    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
+    "build:win": "set GH_TOKEN= && electron-builder --win --publish always"
   },
   "author": "@cesarphernandez",
   "license": "MIT",
@@ -22,11 +23,12 @@
     "@spectrum-web-components/card": "^0.10.11",
     "@spectrum-web-components/illustrated-message": "^0.8.10",
     "electron-log": "^4.4.7",
-    "electron-updater": "^5.0.5",
     "express": "^4.18.1",
     "puppeteer": "^14.3.0",
     "sharp": "^0.30.7",
-    "source-map-support": "^0.5.16"
+    "source-map-support": "^0.5.16",
+    "electron-is-dev": "^2.0.0",
+    "electron-updater": "^5.0.5"
   },
   "devDependencies": {
     "electron": "^19.0.4",
@@ -41,11 +43,17 @@
       "category": "public.app-category.graphics-design",
       "target": "dmg",
       "icon": "assets/baker-dock-icon.png",
-      "asar": false
+      "asar": false,
+      "publish": [
+        "github"
+      ]
     },
     "win": {
       "target": "nsis",
-      "icon": "assets/baker-dock-icon.ico"
+      "icon": "assets/baker-dock-icon.ico",
+      "publish": [
+        "github"
+      ]
     },
     "extraResources": [
       "./assets/**",
