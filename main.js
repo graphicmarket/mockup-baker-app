@@ -7,10 +7,7 @@ const exec = util.promisify(require("child_process").exec);
 const { serverStatus } = require("./server/server");
 const log = require("electron-log");
 const { autoUpdater } = require('electron-updater');
-const { install } = require("source-map-support");
 log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"OM.log");
-const isDev = require("electron-is-dev");
-log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"log.js");
 
 const {
   app,
