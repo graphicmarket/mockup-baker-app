@@ -8,8 +8,10 @@
     "dist": "electron-builder",
     "dist-all": "electron-builder --mac --win",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
-    "build:win": "set GH_TOKEN=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 && electron-builder --win --publish always",
-    "build:mac": "export GH_TOKEN=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 && electron-builder --mac --publish always"
+    "publish:win": "set GH_TOKEN=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 && electron-publisher --win --publish always",
+    "publish:mac": "export GH_TOKEN=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 && electron-builder --mac --publish always",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac"
   },
   "author": "@cesarphernandez",
   "license": "MIT",
@@ -44,7 +46,8 @@
       "icon": "assets/baker-dock-icon.ico",
       "publish": [
         "github"
-      ]
+      ],
+      "asar": false
     },
     "extraResources": [
       "./assets/**",
