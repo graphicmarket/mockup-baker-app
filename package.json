@@ -8,7 +8,7 @@
     "dist": "electron-builder",
     "dist-all": "electron-builder --mac --win",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
-    "build:win": "set GH_TOKEN= && electron-builder --win --publish always"
+    "build:win": "set GH_TOKEN=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 && electron-builder --win --publish always"
   },
   "author": "@cesarphernandez",
   "license": "MIT",
