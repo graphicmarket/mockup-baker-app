@@ -1,6 +1,6 @@
 {
   "name": "toolkit",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "Mockup Baker app",
   "main": "main.js",
   "scripts": {
@@ -8,7 +8,8 @@
     "dist": "electron-builder",
     "dist-all": "electron-builder --mac --win",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
-    "build:win": "set GH_TOKEN=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 && electron-builder --win --publish always"
+    "build:win": "set GH_TOKEN=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 && electron-builder --win --publish always",
+    "build:mac": "export GH_TOKEN=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 && electron-builder --mac --publish always"
   },
   "author": "@cesarphernandez",
   "license": "MIT",

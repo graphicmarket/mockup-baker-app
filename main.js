@@ -54,9 +54,6 @@ app.on("ready", async function () {
   await initialTrayIcons();
   await validatePlugin();
   await hideFromDock();
-  if(app.isPackaged){
-    autoUpdater.checkForUpdates();
-  }
 });
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -282,9 +279,11 @@ let menuTrayTemplate = [
   {
     label: "Check for updates",
     id: "updates",
-    enabled: false,
+    enabled: true,
     click: function () {
-      autoUpdater.checkForUpdates();
+      if(app.isPackaged){
+        autoUpdater.checkForUpdates();
+      }
     },
   },
   {
