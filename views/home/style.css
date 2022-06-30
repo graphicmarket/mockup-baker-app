@@ -1,0 +1,34 @@
+@import '../../node_modules/@spectrum-web-components/styles/typography.css';
+@import '../../node_modules/@spectrum-web-components/styles/theme-darkest.css';
+@import '../../node_modules/@spectrum-web-components/styles/theme-lightest.css';
+@import '../../node_modules/@spectrum-web-components/styles/all-medium-lightest.css';
+@import '../../node_modules/@spectrum-web-components/styles/scale-medium.css';
+@import '../../node_modules/@spectrum-web-components/illustrated-message/sp-illustrated-message.js';
+.menu {
+    display: flex;
+    justify-content: flex-end;
+}
+.item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding-top: 10px;
+}
+.item span {
+    padding-left: 5%;
+    font-size: 15px;
+}
+.item .buttonTry {
+    display: none;
+}
+.item .buttonUninstall {
+    display: none;
+}
+.detailError {
+    display: none;
+}
+
+.item .progress-custom {
+    display: none;
+}

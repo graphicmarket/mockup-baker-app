@@ -1,0 +1,27 @@
+@import '../../node_modules/@spectrum-web-components/styles/typography.css';
+@import '../../node_modules/@spectrum-web-components/styles/theme-darkest.css';
+@import '../../node_modules/@spectrum-web-components/styles/theme-lightest.css';
+@import '../../node_modules/@spectrum-web-components/styles/all-medium-lightest.css';
+@import '../../node_modules/@spectrum-web-components/styles/scale-medium.css';
+@import '../../node_modules/@spectrum-web-components/illustrated-message/sp-illustrated-message.js';
+
+.title {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 5%;
+}
+.title sp-field-label {
+    font-size: 15px;
+    margin: auto;
+}
+.preferences {
+    padding: 5%;
+}
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.title sp-field-label {
+    font-size: 20px;
+}

@@ -1,31 +1,62 @@
 {
   "name": "toolkit",
-  "version": "1.0.0",
-  "description": "Test electron app",
+  "version": "4.0.0",
+  "description": "Mockup Baker app",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "build:osx": "electron-packager ./ Toolkit --platform=darwin --arch=x64 --icon=assets/baker-dock-icon.ico"
+    "dist": "electron-builder",
+    "dist-all": "electron-builder --mac --win",
+    "publish:win": "set GH_TOKEN=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 && electron-builder --win --publish always",
+    "publish:mac": "export GH_TOKEN=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 && electron-builder --mac --publish always",
+    "publish:both": "export GH_TOKEN=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 && electron-builder --mac --win --publish always",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac"
   },
-  "author": "@cesarphernandez",
+  "author": "graphic.market",
   "license": "MIT",
   "dependencies": {
-    "@spectrum-css/button": "^6.0.12",
-    "@spectrum-css/page": "^5.0.10",
-    "@spectrum-css/progresscircle": "^1.0.22",
-    "@spectrum-css/switch": "^1.0.22",
-    "@spectrum-css/typography": "^4.0.19",
-    "@spectrum-css/vars": "^8.0.0",
-    "@spectrum-web-components/bundle": "^0.25.1",
-    "@spectrum-web-components/card": "^0.10.11",
-    "@spectrum-web-components/illustrated-message": "^0.8.10",
-    "electron": "^19.0.4",
+    "electron-log": "^4.4.7",
     "express": "^4.18.1",
     "puppeteer": "^14.3.0",
-    "sharp": "^0.30.6"
+    "sharp": "^0.30.6",
+    "source-map-support": "^0.5.16",
+    "electron-updater": "^5.0.5"
   },
   "devDependencies": {
+    "electron": "^19.0.4",
+    "electron-builder": "^23.0.3",
     "electron-packager": "^15.5.1"
+  },
+  "build": {
+    "appId": "com.electron.builder.graphic.market",
+    "productName": "MockupBaker",
+    "artifactName": "MockupBaker-${version}.${ext}",
+    "mac": {
+      "category": "public.app-category.graphics-design",
+      "icon": "assets/baker-dock-icon.png",
+      "asar": false,
+      "publish": [
+        "github"
+      ]
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/baker-dock-icon.ico",
+      "publish": [
+        "github"
+      ],
+      "asar": false
+    },
+    "extraResources": [
+      "./assets/**",
+      "./Plugin/**"
+    ],
+    "files": [
+      "server/**/*",
+      "main.js",
+      "log.js",
+      "package.json"
+    ]
   }
 }
