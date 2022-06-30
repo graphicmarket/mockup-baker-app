@@ -1,20 +1,19 @@
 {
   "name": "toolkit",
-  "version": "1.0.0",
+  "version": "4.2.0",
   "description": "Mockup Baker app",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder",
     "dist-all": "electron-builder --mac --win",
-    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
     "publish:win": "set GH_TOKEN=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 && electron-builder --win --publish always",
-    "publish:mac": "export GH_TOKEN=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 && electron-builder --mac --publish always",
-    "publish:both": "export GH_TOKEN=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 && electron-builder --mac --win --publish always",
+    "publish:mac": "export GH_TOKEN=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 && electron-builder --mac --publish always",
+    "publish:both": "export GH_TOKEN=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 && electron-builder --mac --win --publish always",
     "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac"
   },
-  "author": "@cesarphernandez",
+  "author": "graphic.market",
   "license": "MIT",
   "dependencies": {
     "electron-log": "^4.4.7",
@@ -35,7 +34,6 @@
     "artifactName": "MockupBaker-${version}.${ext}",
     "mac": {
       "category": "public.app-category.graphics-design",
-      "target": "dmg",
       "icon": "assets/baker-dock-icon.png",
       "asar": false,
       "publish": [

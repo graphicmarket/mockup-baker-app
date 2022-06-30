@@ -8,7 +8,6 @@ const { serverStatus } = require("./server/server");
 const log = require("electron-log");
 const { autoUpdater } = require('electron-updater');
 log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"OM.log");
-
 const {
   app,
   BrowserWindow,
@@ -227,7 +226,7 @@ let menuTrayTemplate = [
   {
     label: "About Mockup Baker..",
     id: "about",
-    enabled: false,
+    enabled: true,
     click: function () {},
   },
   {
@@ -303,27 +302,31 @@ let menuTrayTemplate = [
 //Updates 
 autoUpdater.on("update-available", (_event, releasesNotes, releaseName) =>{
   const dialogOpts = {
-      type: "info",
+      type: "question",
       buttons: ['Ok'],
       title: "Application Update",
-      message: "Notas de versión",
+      message: "Application Update",
       detail: "A new version is being downloaded."
   }
-
   dialog.showMessageBox(dialogOpts, (response) => {});
 })
-// autoUpdater.on("update-not-available", (info) => {
-//   const dialogOpts = {
-//       type: 'info',
-//       buttons: ['Ok'],
-//       title: 'Application already update',
-//       message: "Yay",
-//       detail: 'No new updates.'
-//     }
-//     dialog.showMessageBox(dialogOpts, (response) => {
+autoUpdater.on("update-not-available", (info) => {
+  const dialogOpts = {
+      type: 'info',
+      buttons: ['Ok'],
+      message: "Application already update",
+      detail: 'No new updates.'
+    }
+    dialog.showMessageBox(dialogOpts, (response) => {
 
-//     });
-// });
+    });
+});
+autoUpdater.on('download-progress', (progressObj) => {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+  log.info("Process download",log_message);
+})
 autoUpdater.on("update-downloaded", (_event, releasesNotes, releaseName) => {
   const dialogOpts = {
       type: "info",
@@ -339,12 +342,11 @@ autoUpdater.on("update-downloaded", (_event, releasesNotes, releaseName) => {
 })
 autoUpdater.on('error', (message) => {
   const dialogOpts = {
-      type: "info",
+      type: "warning",
       buttons: [':('],
       title: "Error",
       message: "Error",
       detail: message.message
   }
-  
   dialog.showMessageBox(dialogOpts).then((returnValue) => {});
 })
