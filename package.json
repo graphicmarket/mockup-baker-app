@@ -1,6 +1,6 @@
 {
-  "name": "toolkit",
-  "version": "4.0.0",
+  "name": "mockupbaker-app",
+  "version": "1.0.0",
   "description": "Mockup Baker app",
   "main": "main.js",
   "scripts": {
