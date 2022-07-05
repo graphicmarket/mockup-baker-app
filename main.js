@@ -48,6 +48,7 @@ app.whenReady().then(async () => {
   }
 });
 app.on("ready", async function () {
+  console.log(app.getPath('temp'));
   await validateAplicactionFolder();
   await createFolder();
   await initialTrayIcons();
@@ -174,7 +175,7 @@ const execUPA = async (event) => {
   switch (event) {
     case 'install':
       let plug_route = getResourceAtPath(["Plugin","234a7e6c_PS.ccx"]);
-      return { stdout, stderr } = await exec(`"${command}" ${getUPAextension()}install ${plug_route}`);
+      return { stdout, stderr } = await exec(`"${command}" ${getUPAextension()}install "${plug_route}"`);
     case 'uninstall':
       return { stdout, stderr } = await exec(`"${command}" ${getUPAextension()}remove "Mockup Baker"`);
     case 'validate':
