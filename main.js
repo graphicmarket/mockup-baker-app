@@ -129,6 +129,7 @@ const initialTrayIcons = async () => {
 }
 const validatePlugin = async () => {
   let result = (await execUPA('validate')).stdout.match(/[^\r\n]+/g);
+  log.info("Validation Plugin",result)
   for (let line of result) {
     if (
       line.includes("Mockup Baker") &&
@@ -145,6 +146,7 @@ const validatePlugin = async () => {
 const installPlugin = async () => {
   try {
     let result = (await execUPA('install')).stdout.match(/[^\r\n]+/g);
+    log.info("Install Plugin",result)
     if (result[1].includes("Installation Successful")) {
       if (!status.server) {await serverStatus({ server: true })}
       changeMenu("server-on");
@@ -157,6 +159,7 @@ const installPlugin = async () => {
 const uninstallPlugin = async () => {
 
   let result = (await execUPA('uninstall')).stdout.match(/[^\r\n]+/g);
+  log.info("Uninstall Plugin",result)
   if (result[1].includes("Removal Successful")) {
     changeMenu("server-off");
     await serverStatus({ server: false });
