@@ -222,6 +222,25 @@ const getIconPath = async (iconID) => {
 const getNativeIcon = async (iconId) => {
   return nativeImage.createFromPath(await getIconPath(iconId)).resize({ width: 16 })
 }
+
+const preferencesWindow = () => {
+  newPreferenceWindow = new BrowserWindow({
+    width: 890,
+    height: 520,
+    title: 'Mockup Baker'
+  });
+  newPreferenceWindow.setMenu(null);
+
+  newPreferenceWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'views/preferences/index.html'),
+    protocol: 'file',
+    slashes: true
+  }));
+  newPreferenceWindow.on('closed', () => {
+    newPreferenceWindow = null;
+  });
+}
+
 let menuTrayTemplate = [
   {
     label: "About Mockup Baker..",
@@ -286,9 +305,11 @@ let menuTrayTemplate = [
   {
     label: "Preferences",
     id: "preferences",
-    enabled: false,
+    enabled: true,
     accelerator: process.platform == "darwin" ? "Command+," : "Ctrl+Q",
-    click: function () {},
+    click: () => {
+      preferencesWindow();
+    },
   },
   {
     label: "Quit",
