@@ -225,8 +225,8 @@ const getNativeIcon = async (iconId) => {
 
 const preferencesWindow = () => {
   newPreferenceWindow = new BrowserWindow({
-    width: 890,
-    height: 520,
+    width: 592,
+    height: 346,
     title: 'Mockup Baker'
   });
   newPreferenceWindow.setMenu(null);
