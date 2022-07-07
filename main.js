@@ -227,7 +227,10 @@ const preferencesWindow = () => {
   newPreferenceWindow = new BrowserWindow({
     width: 592,
     height: 346,
-    title: 'Mockup Baker'
+    title: 'Mockup Baker',
+    resizable: false,
+    minimizable: false,
+    maximizable: false
   });
   newPreferenceWindow.setMenu(null);
 

@@ -4,6 +4,7 @@
     function init() {
         const router = new Router([
             new Route('general', 'home.html', true),
+            new Route('update', 'update.html'),
             new Route('info', 'info.html')
         ]);
     }

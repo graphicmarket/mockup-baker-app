@@ -12,6 +12,11 @@
   padding: 0;
 }
 
+#menuList a {
+  font-size: small;
+  text-decoration: none;
+}
+
 i.fa {
   display: block;
 }
@@ -23,23 +28,17 @@ i.fa {
   height: 48px;
   cursor: pointer;
   background-color: transparent;
+  color: rgb(109, 109, 109);
   border: none;
   border-radius: 8px;
-}
-
-.btn a {
-  font-size: small;
-  color: rgb(109, 109, 109);
-  text-decoration: none;
 }
 
 /* Style the active class, and buttons on mouse-over */
 .active, .btn:hover {
   background-color: rgb(229, 227, 227);
-  color: rgb(70, 133, 247);
 }
 
-.active a {
+a .active{
   background-color: rgb(229, 227, 227);
   color: rgb(70, 133, 247);
 }
