@@ -1,8 +1,6 @@
 .body {
   margin: 0;
   padding: 0;
-  background-color: rgb(235, 235, 235);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 #menuList {
@@ -13,6 +11,7 @@
 }
 
 #menuList a {
+  font-family: Arial, Helvetica, sans-serif;
   font-size: small;
   text-decoration: none;
 }
@@ -46,4 +45,25 @@ a .active{
 /* Solid border */
 hr.solid {
   border-top: 0.5px solid rgb(214, 214, 214);
+}
+
+#app {
+  margin-top: 20px;
+  text-align: center;
+  color: rgb(36, 36, 36);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: small;
+}
+
+#app input[type=number] {
+  width: 200px;
+  box-sizing: border-box;
+  padding: 0;
+  outline: none;
+  border-radius: 3px;
+  border: 2px solid rgb(222, 222, 222);
+}
+
+#app input[type=number]:focus {
+  border: 2px solid rgb(143, 172, 237);
 }
