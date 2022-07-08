@@ -48,7 +48,6 @@ app.whenReady().then(async () => {
   }
 });
 app.on("ready", async function () {
-  console.log(app.getPath('temp'));
   await validateAplicactionFolder();
   await createFolder();
   await initialTrayIcons();
@@ -208,6 +207,25 @@ const deleteFolder = async () => {
       fs.rmSync(configfile, { recursive: true, force: true });
     }
 }
+const removeCache = async () => {
+  let configfile = path.join(app.getPath("temp"), "originalMockups");
+  try {
+    await fs.readdir(configfile, (err, files) => {
+      if (err) throw err;
+    
+      for (const file of files) {
+        if (/\.(dae|obj)$/i.test(file)) {
+          fs.unlink(path.join(configfile, file), err => {
+            if (err) throw err;
+          });
+        }
+      }
+    });
+    log.info('Cache cleared')
+  } catch (error) {
+    log.error(error.message)
+  }
+}
 const getResourceAtPath = (params) => {
   // params = [
   //   getResourcePath(),
@@ -285,6 +303,14 @@ let menuTrayTemplate = [
       if(app.isPackaged){
         autoUpdater.checkForUpdates();
       }
+    },
+  },
+  {
+    label: "Clear cache",
+    id: "cache",
+    enabled: true,
+    click: function () {
+      removeCache()
     },
   },
   {
