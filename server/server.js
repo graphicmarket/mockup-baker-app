@@ -53,6 +53,10 @@ server.get('/colladaPath',function(req,res) {
 server.get('/pluginPath',function(req,res) {
     res.send(path.join(process.resourcesPath, "Plugin","234a7e6c_PS.ccx"))
 });
+server.post('/logger', async (req, res) => {
+    log.warn(req.body)
+    res.send(true)
+})
 server.post('/render', async (req, res) => {
     const { body } = req;
     configfile = path.join(app.getPath("temp"), "originalMockups");
@@ -105,9 +109,11 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
                 '--disable-features=IsolateOrigins',
                 '--disable-site-isolation-trials',
                 "--enable-webgl",
-                "--use-gl=angle"
+                "--use-gl=angle",
+                "--disable-features=MITMSoftwareInterstitial"
             ],
             //executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
+            headless: false
         })
 
         const page = await browser.newPage()
@@ -115,7 +121,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
             resolve: false
         })
 
-        await page.goto('http://127.0.0.1:8008/renderfile', { waitUntil: 'networkidle0' })
+        await page.goto('http://127.0.0.1:8008/renderfile?port='+port, { waitUntil: 'networkidle0' })
         await page.evaluateHandle(async (itemData) => {
             return await window.renderScene(itemData)
         }, itemData)
@@ -126,7 +132,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
             return document.querySelector('canvas#app').toDataURL()
         })
         base64 = data.split(';base64,')[1]
-        await browser.close();
+        // await browser.close();
         //Remove collada
         /*await fs.unlink((app.getAppPath() + "./mockups/collada.dae"), (err) => {
             if (err) {throw err;}
