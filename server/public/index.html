@@ -50,8 +50,6 @@
         axios.post('http://127.0.0.1:'+ port +'/logger', {message})
       }
 
-      sentLog('test')
-
       const g = function () {
         const c = document.createElement('link').relList;
         if (c && c.supports && c.supports('modulepreload')) return;
@@ -144,7 +142,7 @@
               camera = scene.getObjectByName(itemData.camera.name);
 
               if (!camera) {
-                throw new Error("Camera not found");
+                throw {message:"Camera not found"};
               }
 
               camera.aspect = itemData.camera.frameWidth / itemData.camera.frameHeight;
@@ -167,8 +165,9 @@
             undefined,
             (error) => console.error(error)
           );
-        }catch(e){
-          sentLog(e.message)
+        }catch(e){ 
+          await sentLog(e.message)
+          axios.post('http://127.0.0.1:'+ port +'/closeBrowser', {message})
         }
       };
     </script>

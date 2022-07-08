@@ -21,6 +21,7 @@ server.use(express.static(join(__dirname, 'Plugin')))
 
 var serverListener = undefined
 let port = '8008'
+var browser = undefined
 
 const { app } = electron;
 let configfile = path.join(app.getPath("temp"), "originalMockups");
@@ -55,6 +56,10 @@ server.get('/pluginPath',function(req,res) {
 });
 server.post('/logger', async (req, res) => {
     log.warn(req.body)
+    res.send(true)
+})
+server.post('/closeBrowser', async (req, res) => {
+    browser.close();
     res.send(true)
 })
 server.post('/render', async (req, res) => {
@@ -102,7 +107,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
             camera,
             scene
         }
-        const browser = await puppeteer.launch({
+        browser = await puppeteer.launch({
             args: [
                 '--no-sandbox',
                 '--disable-web-security',
@@ -112,8 +117,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
                 "--use-gl=angle",
                 "--disable-features=MITMSoftwareInterstitial"
             ],
-            //executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
-            headless: false
+            //executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
         })
 
         const page = await browser.newPage()
