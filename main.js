@@ -7,7 +7,9 @@ const exec = util.promisify(require("child_process").exec);
 const { serverStatus } = require("./server/server");
 const log = require("electron-log");
 const { autoUpdater } = require('electron-updater');
-log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups" ,"OM.log");
+const Store = require('electron-store');
+
+log.transports.file.resolvePath = () => path.join(app.getPath("temp"), "originalMockups", "OM.log");
 const {
   app,
   BrowserWindow,
@@ -28,6 +30,8 @@ let status = {
   plugin: null,
   server: null,
 };
+let store = new Store();
+
 ipcMain.on("closePreferences", async (event, data) => {
   mainWindow.loadURL(
     url.format({
@@ -38,9 +42,24 @@ ipcMain.on("closePreferences", async (event, data) => {
   );
 });
 
+ipcMain.on("getPort", async (event, data) => {
+  console.log('getPort')
+  if(!store.get('port')) {
+    store.set('port', 8008)
+  }
+  // else  let port = 8008;
+  event.reply("sendPort", store.get('port'))
+});
+
+ipcMain.on("setPort", async (event, data) => {
+  // validate data Num, !== null, 4 digitos
+  store.set('port', data)
+  store.get('port') === data ? event.reply('setPort', true) : event.reply('setPort', false);
+});
+
 app.whenReady().then(async () => {
   try {
-    tray = new Tray( await getNativeIcon('baker-tray-icon'));
+    tray = new Tray(await getNativeIcon('baker-tray-icon'));
     tray.setToolTip("Mockup Baker App");
     tray.setContextMenu(Menu.buildFromTemplate(menuTrayTemplate));
   } catch (error) {
@@ -64,9 +83,9 @@ nativeTheme.on("updated", async () => {
   try {
     trayImage = await getNativeIcon('baker-tray-icon')
     tray.setImage(trayImage);
-    await changeAtributteMenu('plugin','','baker-tray-menu-install-plugin')
-    await changeAtributteMenu('server','',`baker-try-menu-server-${status.server ? 'start' : 'stop'}`)
-    await changeAtributteMenu('about','','baker-tray-icon')
+    await changeAtributteMenu('plugin', '', 'baker-tray-menu-install-plugin')
+    await changeAtributteMenu('server', '', `baker-try-menu-server-${status.server ? 'start' : 'stop'}`)
+    await changeAtributteMenu('about', '', 'baker-tray-icon')
     changeMenu()
   } catch (error) {
     log.error(error)
@@ -78,19 +97,19 @@ const changeMenu = async (event) => {
     case "server-on":
       status.plugin = true;
       status.server = true;
-      await changeAtributteMenu('server','Stop server','baker-try-menu-server-start');
-      await changeAtributteMenu('plugin','Uninstall Plugin');
+      await changeAtributteMenu('server', 'Stop server', 'baker-try-menu-server-start');
+      await changeAtributteMenu('plugin', 'Uninstall Plugin');
       break;
     case "server-off":
       status.plugin = false;
       status.server = false;
-      await changeAtributteMenu('server','Start server','baker-try-menu-server-stop')
-      await changeAtributteMenu('plugin','Install Plugin')
+      await changeAtributteMenu('server', 'Start server', 'baker-try-menu-server-stop')
+      await changeAtributteMenu('plugin', 'Install Plugin')
       break;
   }
   tray.setContextMenu(Menu.buildFromTemplate(menuTrayTemplate));
 };
-const changeAtributteMenu = async (id,label = '', icon = '' ) => {
+const changeAtributteMenu = async (id, label = '', icon = '') => {
   if (label != '') {
     menuTrayTemplate.find((item) => item.id == id).label = label;
   }
@@ -101,20 +120,20 @@ const changeAtributteMenu = async (id,label = '', icon = '' ) => {
 const validateAplicactionFolder = async () => {
   if (app.isPackaged && process.platform == 'darwin') {
     const result = await app.isInApplicationsFolder()
-    if(!result) {
+    if (!result) {
       const dialogOpts = {
         type: 'question',
         buttons: ['Move to Applications', 'Do Not Move'],
         message: 'Move to Applications folder?',
         detail: "Mockup Baker App require to run from the Aplication folder, please move to aplication to continue."
-    }
-    dialog.showMessageBox(dialogOpts).then((returnValue) => {
-        if(returnValue.response === 0) {
+      }
+      dialog.showMessageBox(dialogOpts).then((returnValue) => {
+        if (returnValue.response === 0) {
           app.moveToApplicationsFolder()
         } else {
           app.quit()
         }
-    });
+      });
     }
   }
 }
@@ -124,9 +143,10 @@ const hideFromDock = async () => {
   }
 };
 const initialTrayIcons = async () => {
-  await changeAtributteMenu('plugin','','baker-tray-menu-install-plugin')
-  await changeAtributteMenu('about','','baker-tray-icon')
+  await changeAtributteMenu('plugin', '', 'baker-tray-menu-install-plugin')
+  await changeAtributteMenu('about', '', 'baker-tray-icon')
 }
+
 const validatePlugin = async () => {
   let result = (await execUPA('validate')).stdout.match(/[^\r\n]+/g);
   for (let line of result) {
@@ -146,7 +166,7 @@ const installPlugin = async () => {
   try {
     let result = (await execUPA('install')).stdout.match(/[^\r\n]+/g);
     if (result[1].includes("Installation Successful")) {
-      if (!status.server) {await serverStatus({ server: true })}
+      if (!status.server) { await serverStatus({ server: true }) }
       changeMenu("server-on");
     } else {
     }
@@ -164,13 +184,13 @@ const uninstallPlugin = async () => {
   }
 };
 const execUPA = async (event) => {
-  let command ="C:/Program Files/Common Files/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.exe"
+  let command = "C:/Program Files/Common Files/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.exe"
   if (process.platform == 'darwin') {
     command = "/Library/Application Support/Adobe/Adobe Desktop Common/RemoteComponents/UPI/UnifiedPluginInstallerAgent/UnifiedPluginInstallerAgent.app/Contents/MacOS/UnifiedPluginInstallerAgent"
   }
   switch (event) {
     case 'install':
-      let plug_route = getResourceAtPath(["Plugin","234a7e6c_PS.ccx"]);
+      let plug_route = getResourceAtPath(["Plugin", "234a7e6c_PS.ccx"]);
       return { stdout, stderr } = await exec(`"${command}" ${getUPAextension()}install ${plug_route}`);
     case 'uninstall':
       return { stdout, stderr } = await exec(`"${command}" ${getUPAextension()}remove "Mockup Baker"`);
@@ -185,24 +205,24 @@ const changeServer = async (statusServer) => {
   await serverStatus({ server: statusServer });
   if (statusServer) {
     status.server = true;
-    await changeAtributteMenu('server','Stop server','baker-try-menu-server-start');
+    await changeAtributteMenu('server', 'Stop server', 'baker-try-menu-server-start');
   } else {
     status.server = false;
-    await changeAtributteMenu('server','Start server','baker-try-menu-server-stop');
+    await changeAtributteMenu('server', 'Start server', 'baker-try-menu-server-stop');
   }
   changeMenu();
 };
 const createFolder = async () => {
-    let configfile = path.join(app.getPath("temp"), "originalMockups");
-    if (!fs.existsSync(configfile)){
-        await fs.mkdirSync(configfile);
-    }
+  let configfile = path.join(app.getPath("temp"), "originalMockups");
+  if (!fs.existsSync(configfile)) {
+    await fs.mkdirSync(configfile);
+  }
 }
 const deleteFolder = async () => {
-    let configfile = path.join(app.getPath("temp"), "originalMockups");
-    if (fs.existsSync(configfile)){
-      fs.rmSync(configfile, { recursive: true, force: true });
-    }
+  let configfile = path.join(app.getPath("temp"), "originalMockups");
+  if (fs.existsSync(configfile)) {
+    fs.rmSync(configfile, { recursive: true, force: true });
+  }
 }
 const getResourceAtPath = (params) => {
   // params = [
@@ -216,7 +236,7 @@ const getResourcePath = () => {
   return app.isPackaged ? process.resourcesPath : __dirname;
 }
 const getIconPath = async (iconID) => {
-  let theme = nativeTheme.shouldUseDarkColors ? 'dark': 'light' ;
+  let theme = nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
   return getResourceAtPath(["assets", `${iconID}-${theme}.png`]);
 }
 const getNativeIcon = async (iconId) => {
@@ -225,31 +245,37 @@ const getNativeIcon = async (iconId) => {
 
 const preferencesWindow = () => {
   newPreferenceWindow = new BrowserWindow({
-    width: 592,
+    width: 1024,
     height: 346,
     title: 'Mockup Baker',
     resizable: false,
     minimizable: false,
-    maximizable: false
+    maximizable: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: false,
+      preload: path.join(__dirname, 'views', 'preferences', 'js', 'general.js')
+    },
   });
   newPreferenceWindow.setMenu(null);
 
   newPreferenceWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'views/preferences/index.html'),
+    pathname: path.join(__dirname, 'views/preferences/views/general.html'),
     protocol: 'file',
     slashes: true
   }));
   newPreferenceWindow.on('closed', () => {
     newPreferenceWindow = null;
   });
-}
+  newPreferenceWindow.webContents.openDevTools()
+};
 
 let menuTrayTemplate = [
   {
     label: "About Mockup Baker..",
     id: "about",
     enabled: true,
-    click: function () {},
+    click: function () { },
   },
   {
     type: "separator",
@@ -300,7 +326,7 @@ let menuTrayTemplate = [
     id: "updates",
     enabled: true,
     click: function () {
-      if(app.isPackaged){
+      if (app.isPackaged) {
         autoUpdater.checkForUpdates();
       }
     },
@@ -324,53 +350,53 @@ let menuTrayTemplate = [
   },
 ];
 //Updates 
-autoUpdater.on("update-available", (_event, releasesNotes, releaseName) =>{
+autoUpdater.on("update-available", (_event, releasesNotes, releaseName) => {
   const dialogOpts = {
-      type: "question",
-      buttons: ['Ok'],
-      title: "Application Update",
-      message: "Application Update",
-      detail: "A new version is being downloaded."
+    type: "question",
+    buttons: ['Ok'],
+    title: "Application Update",
+    message: "Application Update",
+    detail: "A new version is being downloaded."
   }
-  dialog.showMessageBox(dialogOpts, (response) => {});
+  dialog.showMessageBox(dialogOpts, (response) => { });
 })
 autoUpdater.on("update-not-available", (info) => {
   const dialogOpts = {
-      type: 'info',
-      buttons: ['Ok'],
-      message: "Application already update",
-      detail: 'No new updates.'
-    }
-    dialog.showMessageBox(dialogOpts, (response) => {
+    type: 'info',
+    buttons: ['Ok'],
+    message: "Application already update",
+    detail: 'No new updates.'
+  }
+  dialog.showMessageBox(dialogOpts, (response) => {
 
-    });
+  });
 });
 autoUpdater.on('download-progress', (progressObj) => {
   let log_message = "Download speed: " + progressObj.bytesPerSecond;
   log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
   log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-  log.info("Process download",log_message);
+  log.info("Process download", log_message);
 })
 autoUpdater.on("update-downloaded", (_event, releasesNotes, releaseName) => {
   const dialogOpts = {
-      type: "info",
-      buttons: ['Restart', 'Later'],
-      title: "Application Update",
-      message: "Notas de versión",
-      detail: "Restart the application."
+    type: "info",
+    buttons: ['Restart', 'Later'],
+    title: "Application Update",
+    message: "Notas de versión",
+    detail: "Restart the application."
   }
-  
+
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
-      if(returnValue.response === 0) autoUpdater.quitAndInstall();
+    if (returnValue.response === 0) autoUpdater.quitAndInstall();
   });
 })
 autoUpdater.on('error', (message) => {
   const dialogOpts = {
-      type: "warning",
-      buttons: [':('],
-      title: "Error",
-      message: "Error",
-      detail: message.message
+    type: "warning",
+    buttons: [':('],
+    title: "Error",
+    message: "Error",
+    detail: message.message
   }
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {});
+  dialog.showMessageBox(dialogOpts).then((returnValue) => { });
 })
