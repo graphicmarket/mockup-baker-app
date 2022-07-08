@@ -24,6 +24,7 @@ const {
 } = electron;
 
 let mainWindow;
+let newPreferenceWindow;
 let win = null;
 let tray = null;
 let status = {
@@ -45,6 +46,7 @@ ipcMain.on("closePreferences", async (event, data) => {
 ipcMain.on("getPort", async (event, data) => {
   console.log('getPort')
   if(!store.get('port')) {
+    console.log("port default 8008")
     store.set('port', 8008)
   }
   // else  let port = 8008;
@@ -53,7 +55,12 @@ ipcMain.on("getPort", async (event, data) => {
 
 ipcMain.on("setPort", async (event, data) => {
   // validate data Num, !== null, 4 digitos
+  console.log("Set port =>", data)
   store.set('port', data)
+  if (status.server) {
+    await serverStatus({ server: false });
+    await serverStatus({ server: true, port:store.get('port') });
+  }
   store.get('port') === data ? event.reply('setPort', true) : event.reply('setPort', false);
 });
 
@@ -155,7 +162,7 @@ const validatePlugin = async () => {
       !line.includes("Mockup Baker Assemblers")
     ) {
       changeMenu("server-on");
-      await serverStatus({ server: true });
+      await serverStatus({ server: true, port:store.get('port') });
       return;
     }
   }
@@ -166,7 +173,7 @@ const installPlugin = async () => {
   try {
     let result = (await execUPA('install')).stdout.match(/[^\r\n]+/g);
     if (result[1].includes("Installation Successful")) {
-      if (!status.server) { await serverStatus({ server: true }) }
+      if (!status.server) { await serverStatus({ server: true, port:store.get('port') }) }
       changeMenu("server-on");
     } else {
     }
@@ -202,7 +209,7 @@ const getUPAextension = () => {
   return process.platform == 'darwin' ? '--' : '/'
 }
 const changeServer = async (statusServer) => {
-  await serverStatus({ server: statusServer });
+  await serverStatus({ server: statusServer, port:store.get('port') });
   if (statusServer) {
     status.server = true;
     await changeAtributteMenu('server', 'Stop server', 'baker-try-menu-server-start');
@@ -252,7 +259,7 @@ const preferencesWindow = () => {
     minimizable: false,
     maximizable: false,
     webPreferences: {
-      nodeIntegration: false,
+      nodeIntegration: true,
       contextIsolation: false,
       preload: path.join(__dirname, 'views', 'preferences', 'js', 'general.js')
     },
@@ -337,7 +344,11 @@ let menuTrayTemplate = [
     enabled: true,
     accelerator: process.platform == "darwin" ? "Command+," : "Ctrl+Q",
     click: () => {
-      preferencesWindow();
+      if (newPreferenceWindow != undefined) {
+        newPreferenceWindow.show()
+      } else {
+        preferencesWindow();
+      }
     },
   },
   {

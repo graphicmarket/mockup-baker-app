@@ -20,7 +20,7 @@ server.use(express.static(join(__dirname, 'mockups')))
 server.use(express.static(join(__dirname, 'Plugin')))
 
 var serverListener = undefined;
-let port = config.PORT;
+let port = null;
 
 const { app } = electron;
 let configfile = path.join(app.getPath("temp"), "originalMockups");
@@ -28,9 +28,10 @@ let configfile = path.join(app.getPath("temp"), "originalMockups");
 async function serverStatus(data) {
   try {
     if (data.server) {
-      serverListener = await server.listen(port, () => {
-        log.info(`Example app listening on port ${port}`)
+      serverListener = await server.listen(data.port, () => {
+        log.info(`Example app listening on port ${data.port}`)
       });
+      port = data.port;
     } else {
       serverListener.close(() => {
         log.info('Closed out remaining connections');
@@ -38,6 +39,7 @@ async function serverStatus(data) {
     }
     return true
   } catch (e) {
+    console.log(e.message)
     return false
   }
 }
@@ -55,6 +57,7 @@ server.get('/pluginPath', function (req, res) {
 });
 server.post('/render', async (req, res) => {
   const { body } = req;
+  //let processRender = true
   configfile = path.join(app.getPath("temp"), "originalMockups");
   if (body.folder === '' || body.folder === undefined) {
     res.setHeader('Content-Type', 'Response')
@@ -92,7 +95,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
       });
     }
     const itemData = {
-      sceneFileURL: 'http://127.0.0.1:8008/collada',
+      sceneFileURL: `http://127.0.0.1:${port}/collada`,
       texture,
       targetMaterialName,
       camera,
@@ -109,16 +112,13 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
       ],
       //executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
     })
-
-    await page.goto('http://127.0.0.1:8008/renderfile', { waitUntil: 'networkidle0' })
+    
+    const page = await browser.newPage()
+    await page.goto(`http://127.0.0.1:${port}/renderfile`, { waitUntil: 'networkidle0' })
     await page.evaluateHandle(async (itemData) => {
       return await window.renderScene(itemData)
     }, itemData)
-
-    await page.goto(index, { waitUntil: 'networkidle0' });
-    await page.evaluateHandle(async (itemData) => {
-      return await window.renderScene(itemData);
-    }, itemData);
+    await page.waitForSelector('#rendered')
 
     const data = await page.evaluate(() => {
       return document.querySelector('canvas#app').toDataURL()
