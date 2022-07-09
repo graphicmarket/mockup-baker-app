@@ -44,7 +44,6 @@ ipcMain.on("closePreferences", async (event, data) => {
 });
 
 ipcMain.on("getPort", async (event, data) => {
-  console.log('getPort')
   if(!store.get('port')) {
     console.log("port default 8008")
     store.set('port', 8008)
@@ -55,7 +54,6 @@ ipcMain.on("getPort", async (event, data) => {
 
 ipcMain.on("setPort", async (event, data) => {
   // validate data Num, !== null, 4 digitos
-  console.log("Set port =>", data)
   store.set('port', data)
   if (status.server) {
     await serverStatus({ server: false });
@@ -63,6 +61,13 @@ ipcMain.on("setPort", async (event, data) => {
   }
   store.get('port') === data ? event.reply('setPort', true) : event.reply('setPort', false);
 });
+
+const getInitialPort = () => {
+  if(!store.get('port')) {
+    console.log("port default 8008")
+    store.set('port', 8008)
+  }
+};
 
 app.whenReady().then(async () => {
   try {
@@ -74,6 +79,7 @@ app.whenReady().then(async () => {
   }
 });
 app.on("ready", async function () {
+  await getInitialPort();
   await validateAplicactionFolder();
   await createFolder();
   await initialTrayIcons();
