@@ -44,26 +44,26 @@ ipcMain.on("closePreferences", async (event, data) => {
 });
 
 ipcMain.on("getPort", async (event, data) => {
-  if(!store.get('port')) {
+  if (!store.get('port')) {
     console.log("port default 8008")
     store.set('port', 8008)
   }
-  // else  let port = 8008;
   event.reply("sendPort", store.get('port'))
 });
 
 ipcMain.on("setPort", async (event, data) => {
-  // validate data Num, !== null, 4 digitos
-  store.set('port', data)
-  if (status.server) {
-    await serverStatus({ server: false });
-    await serverStatus({ server: true, port:store.get('port') });
+  if (data !== null) {
+    store.set('port', data)
+    if (status.server) {
+      await serverStatus({ server: false });
+      await serverStatus({ server: true, port: store.get('port') });
+    }
+    store.get('port') === data ? event.reply('setPort', true) : event.reply('setPort', false);
   }
-  store.get('port') === data ? event.reply('setPort', true) : event.reply('setPort', false);
 });
 
 const getInitialPort = () => {
-  if(!store.get('port')) {
+  if (!store.get('port')) {
     console.log("port default 8008")
     store.set('port', 8008)
   }
@@ -168,7 +168,7 @@ const validatePlugin = async () => {
       !line.includes("Mockup Baker Assemblers")
     ) {
       changeMenu("server-on");
-      await serverStatus({ server: true, port:store.get('port') });
+      await serverStatus({ server: true, port: store.get('port') });
       return;
     }
   }
@@ -179,7 +179,7 @@ const installPlugin = async () => {
   try {
     let result = (await execUPA('install')).stdout.match(/[^\r\n]+/g);
     if (result[1].includes("Installation Successful")) {
-      if (!status.server) { await serverStatus({ server: true, port:store.get('port') }) }
+      if (!status.server) { await serverStatus({ server: true, port: store.get('port') }) }
       changeMenu("server-on");
     } else {
     }
@@ -215,7 +215,7 @@ const getUPAextension = () => {
   return process.platform == 'darwin' ? '--' : '/'
 }
 const changeServer = async (statusServer) => {
-  await serverStatus({ server: statusServer, port:store.get('port') });
+  await serverStatus({ server: statusServer, port: store.get('port') });
   if (statusServer) {
     status.server = true;
     await changeAtributteMenu('server', 'Stop server', 'baker-try-menu-server-start');
