@@ -54,7 +54,6 @@
               },
               error: async function (text) {
                   oldCons.error(text);
-                  oldCons.error(Object.keys(text));
                   await sentLog(text.message);          
                   axios.post('http://127.0.0.1:'+ port +'/closeBrowser')
               }

@@ -137,7 +137,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
             return document.querySelector('canvas#app').toDataURL()
         })
         base64 = data.split(';base64,')[1]
-        // await browser.close();
+        await browser.close();
         //Remove collada
         /*await fs.unlink((app.getAppPath() + "./mockups/collada.dae"), (err) => {
             if (err) {throw err;}
