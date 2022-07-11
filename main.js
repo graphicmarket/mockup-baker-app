@@ -63,13 +63,6 @@ ipcMain.on("setPort", async (event, data) => {
   }
 });
 
-ipcMain.on("statusServer", async (event, data) => {
-  if (data !== null) {
-    console.log(data)
-    status.server ? event.reply('statusServer', true) : event.reply('statusServer', false);
-  }
-});
-
 const getInitialPort = () => {
   if (!store.get('port')) {
     console.log("port default 8008")
@@ -225,11 +218,13 @@ const getUPAextension = () => {
 const changeServer = async (statusServer) => {
   await serverStatus({ server: statusServer, port: store.get('port') });
   if (statusServer) {
-    status.server = true;
     await changeAtributteMenu('server', 'Stop server', 'baker-try-menu-server-start');
   } else {
-    status.server = false;
     await changeAtributteMenu('server', 'Start server', 'baker-try-menu-server-stop');
+  }
+  status.server = statusServer;
+  if(newPreferenceWindow){
+    newPreferenceWindow.webContents.send("statusServer", statusServer);
   }
   changeMenu();
 };

@@ -16,8 +16,8 @@ function getPort() {
         }    
     }
 
-    window.addEventListener('focusout', validateFunction, false);
-    window.addEventListener('keypress', validateFunction, false);
+    aplicationPort.addEventListener('focusout', validateFunction, false);
+    aplicationPort.addEventListener('keypress', validateFunction, false);
 
     ipcRenderer.send("getPort", true);
     ipcRenderer.on("sendPort", (event, data) => {
@@ -27,10 +27,12 @@ function getPort() {
     });
 
     ipcRenderer.on("statusServer", (event, data) => {
-        console.log(data)
+        console.log('Is in status server', data)
         if (data) {
             console.log('server on');
-            aplicationPort.disabled = true;
+            aplicationPort.setAttribute('disabled', true)
+        }else{
+            aplicationPort.removeAttribute('disabled')
         }
     });
 
