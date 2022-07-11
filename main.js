@@ -280,8 +280,10 @@ const preferencesWindow = () => {
     protocol: 'file',
     slashes: true
   }));
-  newPreferenceWindow.on('closed', () => {
-    newPreferenceWindow = null;
+  newPreferenceWindow.on('close', (evnt) => {
+    evnt.preventDefault();
+    newPreferenceWindow.hide()
+    newPreferenceWindow = undefined;
   });
   newPreferenceWindow.webContents.openDevTools()
 };
