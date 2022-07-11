@@ -34,17 +34,43 @@
         }
       }
     </script>
-    <script src="./axios/axios.min.js"></script>
-    <script type="module">
-      //assets/index.d9029e07.js
-      import * as THREE from 'three';
-      import { ColladaLoader} from "./loaders/ColladaLoader.js";
-      import { GLTFLoader } from "./loaders/GLTFLoader.js";
-
+    <script>
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const port = urlParams.get('port')
       console.log(port);
+
+      var console = (function(oldCons){
+          return {
+              log: function(text){
+                  oldCons.log(text);
+              },
+              info: function (text) {
+                  oldCons.info(text);
+              },
+              warn: async function (text) {
+                  oldCons.warn(text);
+                  await sentLog(text)
+              },
+              error: async function (text) {
+                  oldCons.error(text);
+                  oldCons.error(Object.keys(text));
+                  await sentLog(text.message);          
+                  axios.post('http://127.0.0.1:'+ port +'/closeBrowser')
+              }
+          };
+      }(window.console));
+
+      //Then redefine the old console
+      window.console = console;
+    </script>
+    <script src="./axios/axios.min.js"></script>
+    <script type="module">
+
+      //assets/index.d9029e07.js
+      import * as THREE from 'three';
+      import { ColladaLoader} from "./loaders/ColladaLoader.js";
+      import { GLTFLoader } from "./loaders/GLTFLoader.js";
 
       window.sentLog = async (message) => {
         axios.post('http://127.0.0.1:'+ port +'/logger', {message})
@@ -141,7 +167,7 @@
               });
 
               scene.add(mockup);
-              camera = scene.getObjectByName(itemData.camera.name);
+              camera = scene.getObjectByNamed(itemData.camera.name);
 
               if (!camera) {
                 throw {message:"Camera not found"};

@@ -117,7 +117,8 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
                 "--use-gl=angle",
                 "--disable-features=MITMSoftwareInterstitial"
             ],
-            //executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            //executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+            // headless: false
         })
 
         const page = await browser.newPage()
