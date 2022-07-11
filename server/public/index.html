@@ -50,6 +50,8 @@
         axios.post('http://127.0.0.1:'+ port +'/logger', {message})
       }
 
+      sentLog('Starting render process')
+
       const g = function () {
         const c = document.createElement('link').relList;
         if (c && c.supports && c.supports('modulepreload')) return;
@@ -167,7 +169,7 @@
           );
         }catch(e){ 
           await sentLog(e.message)
-          axios.post('http://127.0.0.1:'+ port +'/closeBrowser', {message})
+          axios.post('http://127.0.0.1:'+ port +'/closeBrowser')
         }
       };
     </script>
