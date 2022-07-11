@@ -56,15 +56,22 @@ hr.solid {
   overflow: auto;
 }
 
-#generalForm input[type=number] {
+#aplicationPort {
   width: 200px;
   box-sizing: border-box;
   padding: 0;
   outline: none;
   border-radius: 3px;
-  border: 2px solid rgb(222, 222, 222);
 }
 
-#generalForm input[type=number]:focus {
+#aplicationPort:focus {
   border: 2px solid rgb(143, 172, 237);
+}
+
+.aplicationPort {
+  border: 2px solid red;
+}
+
+#aplicationPort::-webkit-inner-spin-button {
+  -webkit-appearance: none;
 }

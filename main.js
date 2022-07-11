@@ -48,7 +48,8 @@ ipcMain.on("getPort", async (event, data) => {
     console.log("port default 8008")
     store.set('port', 8008)
   }
-  event.reply("sendPort", store.get('port'))
+  event.reply("sendPort", store.get('port'));
+  event.reply("statusServer", status.server);
 });
 
 ipcMain.on("setPort", async (event, data) => {
@@ -59,6 +60,13 @@ ipcMain.on("setPort", async (event, data) => {
       await serverStatus({ server: true, port: store.get('port') });
     }
     store.get('port') === data ? event.reply('setPort', true) : event.reply('setPort', false);
+  }
+});
+
+ipcMain.on("statusServer", async (event, data) => {
+  if (data !== null) {
+    console.log(data)
+    status.server ? event.reply('statusServer', true) : event.reply('statusServer', false);
   }
 });
 

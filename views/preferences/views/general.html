@@ -4,6 +4,16 @@
     <link rel="stylesheet" href="../styles/index.css" />
     <link rel="stylesheet" href="../styles/font-awesome-4.7.0/css/font-awesome.min.css" />
     <title>General</title>
+    <style>
+      .mystyle {
+        width: 100%;
+        padding: 25px;
+        background-color: coral;
+        color: white;
+        font-size: 25px;
+        box-sizing: border-box;
+      }
+      </style>
   </head>
   <body>
     <header>
@@ -31,7 +41,7 @@
     <hr class="solid">
     <form id="generalForm">
       <label for="aplicationPort">Aplication port: </label>
-      <input type="number" name="port" id="aplicationPort" min="0" max="65536" />
+      <input type="number" name="port" id="aplicationPort" min="1" max="65535" required/>
     </form>
     <script src="../js/general.js"></script>
     <script>
