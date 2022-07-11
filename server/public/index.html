@@ -38,7 +38,6 @@
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const port = urlParams.get('port')
-      console.log(port);
 
       var console = (function(oldCons){
           return {
@@ -181,7 +180,6 @@
                 camera.top = 1;
                 camera.bottom = -1;
               }
-              console.log(camera)
               camera.updateProjectionMatrix();
               renderer.render(scene, camera);
 
