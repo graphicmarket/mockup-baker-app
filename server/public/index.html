@@ -50,7 +50,7 @@
               },
               warn: async function (text) {
                   oldCons.warn(text);
-                  await sentLog(text)
+                  await sentLog('No err: '+ text)
               },
               error: async function (text) {
                   oldCons.error(text);
@@ -167,10 +167,10 @@
               });
 
               scene.add(mockup);
-              camera = scene.getObjectByNamed(itemData.camera.name);
+              camera = scene.getObjectByName(itemData.camera.name);
 
               if (!camera) {
-                throw {message:"Camera not found"};
+                console.error({message: "Camera not found"});
               }
 
               camera.aspect = itemData.camera.frameWidth / itemData.camera.frameHeight;
