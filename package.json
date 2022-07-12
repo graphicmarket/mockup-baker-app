@@ -55,6 +55,7 @@
     ],
     "files": [
       "server/**/*",
+      "preferences/**/*",
       "main.js",
       "log.js",
       "package.json"

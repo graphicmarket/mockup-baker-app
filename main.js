@@ -45,7 +45,6 @@ ipcMain.on("closePreferences", async (event, data) => {
 
 ipcMain.on("getPort", async (event, data) => {
   if (!store.get('port')) {
-    console.log("port default 8008")
     store.set('port', 8008)
   }
   event.reply("sendPort", store.get('port'));
@@ -53,6 +52,7 @@ ipcMain.on("getPort", async (event, data) => {
 });
 
 ipcMain.on("setPort", async (event, data) => {
+  console.log(data)
   if (data !== null) {
     store.set('port', data)
     if (status.server) {
@@ -65,7 +65,6 @@ ipcMain.on("setPort", async (event, data) => {
 
 const getInitialPort = () => {
   if (!store.get('port')) {
-    console.log("port default 8008")
     store.set('port', 8008)
   }
 };
@@ -270,13 +269,13 @@ const preferencesWindow = (preferencesView) => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      preload: path.join(__dirname, 'views', 'preferences', 'js', 'general.js')
+      preload: path.join(__dirname, 'preferences', 'js', 'general.js')
     },
   });
   newPreferenceWindow.setMenu(null);
 
   newPreferenceWindow.loadURL(url.format({
-    pathname: path.join(__dirname, `views/preferences/views/${preferencesView}.html`),
+    pathname: path.join(__dirname, `preferences/views/${preferencesView}.html`),
     protocol: 'file',
     slashes: true
   }));

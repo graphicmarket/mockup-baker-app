@@ -108,3 +108,11 @@ hr.solid {
   cursor: not-allowed;
   pointer-events: none;
 } 
+
+#aboutTitle {
+  font-size: 15px;
+}
+.aboutDetail {
+  font-size: 10px;
+  color: gray;
+}

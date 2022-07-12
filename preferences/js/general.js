@@ -5,19 +5,19 @@ function getPort() {
 
     const validateFunction = (e) => {
         console.log(e.target.value)
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && e.type == "keypress") {
             e.preventDefault();
-        }
-        
-        let valuePort = Number(e.target.value);
-        if (!isNaN(valuePort) && valuePort > 0 && valuePort < 65536) {
-            numberText.classList.remove("numberTextError");
-            setPort(valuePort);
-        } else {
-            numberText.classList.remove("numberTextSuccess");
-            numberText.classList.add("numberTextError");
-            aplicationPort.classList.add("borderRed");
-            numberText.innerHTML = "The port must be between 0 and 65535";
+        } else if (e.type == "keyup"){
+            let valuePort = Number(e.target.value);
+            if (!isNaN(valuePort) && valuePort > 0 && valuePort < 65536) {
+                numberText.classList.remove("numberTextError");
+                setPort(valuePort);
+            } else {
+                numberText.classList.remove("numberTextSuccess");
+                numberText.classList.add("numberTextError");
+                aplicationPort.classList.add("borderRed");
+                numberText.innerHTML = "The port must be between 0 and 65535";
+            }
         }
     };
 
@@ -41,16 +41,13 @@ function getPort() {
 
     const setPort = () => {
         ipcRenderer.send("setPort", aplicationPort.value);
+        console.log('send port')
         ipcRenderer.on("setPort", (event, data) => {
-            console.log(data)
             if (data) {
                 aplicationPort.classList.remove("borderRed");
                 numberText.classList.add("numberTextSuccess");
                 numberText.innerHTML = "Port changed successfully";
                 //Timeout para quitar el texto y la clase numberTextSuccess
-                setTimeout(() => {
-                    numberText.innerHTML = "";
-                }, 2000);
             } else {
                 getPort();
             }
