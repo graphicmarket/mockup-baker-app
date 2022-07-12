@@ -19,8 +19,9 @@ server.use(express.urlencoded({ limit: '100mb', extended: true }))
 server.use(express.static(join(__dirname, 'mockups')))
 server.use(express.static(join(__dirname, 'Plugin')))
 
-var serverListener = undefined;
 let port = null;
+let serverListener = undefined
+let browser = undefined
 
 const { app } = electron;
 let configfile = path.join(app.getPath("temp"), "originalMockups");
@@ -55,6 +56,14 @@ server.get('/colladaPath', function (req, res) {
 server.get('/pluginPath', function (req, res) {
   res.send(path.join(process.resourcesPath, "Plugin", "234a7e6c_PS.ccx"))
 });
+server.post('/logger', async (req, res) => {
+    log.warn(req.body)
+    res.send(true)
+})
+server.post('/closeBrowser', async (req, res) => {
+    browser.close();
+    res.send(true)
+})
 server.post('/render', async (req, res) => {
   const { body } = req;
   //let processRender = true
@@ -108,13 +117,13 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
         '--disable-features=IsolateOrigins',
         '--disable-site-isolation-trials',
         "--enable-webgl",
-        "--use-gl=angle"
+        "--use-gl=angle",
+        "--disable-features=MITMSoftwareInterstitial"
       ],
-      //executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
     })
     
     const page = await browser.newPage()
-    await page.goto(`http://127.0.0.1:${port}/renderfile`, { waitUntil: 'networkidle0' })
+    await page.goto(`http://127.0.0.1:${port}/renderfile?port=${port}`, { waitUntil: 'networkidle0' })
     await page.evaluateHandle(async (itemData) => {
       return await window.renderScene(itemData)
     }, itemData)

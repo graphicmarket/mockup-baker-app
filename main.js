@@ -162,6 +162,7 @@ const initialTrayIcons = async () => {
 
 const validatePlugin = async () => {
   let result = (await execUPA('validate')).stdout.match(/[^\r\n]+/g);
+  log.info("Validation Plugin",result)
   for (let line of result) {
     if (
       line.includes("Mockup Baker") &&
@@ -178,6 +179,7 @@ const validatePlugin = async () => {
 const installPlugin = async () => {
   try {
     let result = (await execUPA('install')).stdout.match(/[^\r\n]+/g);
+    log.info("Install Plugin",result)
     if (result[1].includes("Installation Successful")) {
       if (!status.server) { await serverStatus({ server: true, port: store.get('port') }) }
       changeMenu("server-on");
@@ -190,6 +192,7 @@ const installPlugin = async () => {
 const uninstallPlugin = async () => {
 
   let result = (await execUPA('uninstall')).stdout.match(/[^\r\n]+/g);
+  log.info("Uninstall Plugin",result)
   if (result[1].includes("Removal Successful")) {
     changeMenu("server-off");
     await serverStatus({ server: false });
@@ -203,8 +206,8 @@ const execUPA = async (event) => {
   }
   switch (event) {
     case 'install':
-      let plug_route = getResourceAtPath(["Plugin", "234a7e6c_PS.ccx"]);
-      return { stdout, stderr } = await exec(`"${command}" ${getUPAextension()}install ${plug_route}`);
+      let plug_route = getResourceAtPath(["Plugin","234a7e6c_PS.ccx"]);
+      return { stdout, stderr } = await exec(`"${command}" ${getUPAextension()}install "${plug_route}"`);
     case 'uninstall':
       return { stdout, stderr } = await exec(`"${command}" ${getUPAextension()}remove "Mockup Baker"`);
     case 'validate':
@@ -237,6 +240,25 @@ const deleteFolder = async () => {
   let configfile = path.join(app.getPath("temp"), "originalMockups");
   if (fs.existsSync(configfile)) {
     fs.rmSync(configfile, { recursive: true, force: true });
+  }
+}
+const removeCache = async () => {
+  let configfile = path.join(app.getPath("temp"), "originalMockups");
+  try {
+    await fs.readdir(configfile, (err, files) => {
+      if (err) throw err;
+    
+      for (const file of files) {
+        if (/\.(dae|obj)$/i.test(file)) {
+          fs.unlink(path.join(configfile, file), err => {
+            if (err) throw err;
+          });
+        }
+      }
+    });
+    log.info('Cache cleared')
+  } catch (error) {
+    log.error(error.message)
   }
 }
 const getResourceAtPath = (params) => {
@@ -351,6 +373,14 @@ let menuTrayTemplate = [
       if (app.isPackaged) {
         autoUpdater.checkForUpdates();
       }
+    },
+  },
+  {
+    label: "Clear cache",
+    id: "cache",
+    enabled: true,
+    click: function () {
+      removeCache()
     },
   },
   {

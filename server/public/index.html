@@ -34,10 +34,47 @@
         }
       }
     </script>
+    <script>
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const port = urlParams.get('port')
+
+      var console = (function(oldCons){
+          return {
+              log: function(text){
+                  oldCons.log(text);
+              },
+              info: function (text) {
+                  oldCons.info(text);
+              },
+              warn: async function (text) {
+                  oldCons.warn(text);
+                  await sentLog('No err: '+ text)
+              },
+              error: async function (text) {
+                  oldCons.error(text);
+                  await sentLog(text.message);          
+                  axios.post('http://127.0.0.1:'+ port +'/closeBrowser')
+              }
+          };
+      }(window.console));
+
+      //Then redefine the old console
+      window.console = console;
+    </script>
+    <script src="./axios/axios.min.js"></script>
     <script type="module">
+
       //assets/index.d9029e07.js
-      import * as n from 'three';
-      import { ColladaLoader as h } from "https://cdn.skypack.dev/three@0.135.0/examples/jsm/loaders/ColladaLoader.js";
+      import * as THREE from 'three';
+      import { ColladaLoader} from "./loaders/ColladaLoader.js";
+      import { GLTFLoader } from "./loaders/GLTFLoader.js";
+
+      window.sentLog = async (message) => {
+        axios.post('http://127.0.0.1:'+ port +'/logger', {message})
+      }
+
+      sentLog('Starting render process')
 
       const g = function () {
         const c = document.createElement('link').relList;
@@ -74,70 +111,89 @@
         }
       };
       g();
-      let t, i, s;
+      let camera, scene, renderer;
 
-      window.renderScene = async (o) => {
-        const c = document.querySelector('#app');
-        (s = new n.WebGLRenderer({
-          antialias: !0,
-          canvas: c,
-          alpha: !0,
-          preserveDrawingBuffer: !0,
-        })),
-          s.setPixelRatio(1),
-          s.setSize(o.camera.frameWidth, o.camera.frameHeight),
-          (s.outputEncoding = n.sRGBAEncoding),
-          s.setClearColor(new n.Color(16711680), 0),
-          (i = new n.Scene());
-
-        const m = new n.AmbientLight(16777215);
-        i.add(m);
-
-        const l = new n.TextureLoader();
-        l.crossOrigin = 'Anonymous';
-
-        function e(d) {
-          return new Promise((u) => {
-            l.load(d, u);
+      window.renderScene = async (itemData) => {
+        try{
+          const canvas = document.querySelector("#app");
+          renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            canvas,
+            alpha: true,
+            preserveDrawingBuffer: true,
+            // premultipliedAlpha: false
           });
-        }
-        const r = await e(o.texture);
-        new h().load(
-          o.sceneFileURL,
+          renderer.setPixelRatio(1);
+          renderer.setSize(itemData.camera.frameWidth, itemData.camera.frameHeight);
+          renderer.outputEncoding = THREE.sRGBAEncoding;
+          renderer.setClearColor(new THREE.Color(0xff0000), 0);
 
-          function (d) {
-            let u = d.scene;
-            if (
-              (u.traverse(function (a) {
-                a.isMesh &&
-                  ((a.material.color = new n.Color(16777215)),
-                  (a.material.blending = n.NoBlending),
-                  (a.material.alphaTest = 0.5),
-                  (a.material.transparent = !1),
-                  (a.material.map = r),
-                  a.material.name == o.targetMaterialName &&
-                    (a.material.map = r));
-              }),
-              i.add(u),
-              (t = i.getObjectByName(o.camera.name)),
-              !t)
-            )
-              throw new Error('Camera not found');
-            (t.aspect = o.camera.frameWidth / o.camera.frameHeight),
-              t.type == 'OrthographicCamera' &&
-                ((t.zoom = i.getObjectByName('zoom').position.x * 100 || 20),
-                (t.left = -t.aspect),
-                (t.right = t.aspect),
-                (t.top = 1),
-                (t.bottom = -1)),
-              t.updateProjectionMatrix(),
-              s.render(i, t);
-            let p = document.createElement('div');
-            p.setAttribute('id', 'rendered'), document.body.appendChild(p);
-          },
-          void 0,
-          (d) => console.error(d)
-        );
+          scene = new THREE.Scene();
+
+          const ambientLight = new THREE.AmbientLight(0xffffff);
+          scene.add(ambientLight);
+
+          const TextureLoader = new THREE.TextureLoader();
+          TextureLoader.crossOrigin = "Anonymous";
+
+          function loadTexture(url) {
+            return new Promise((resolve) => {
+              TextureLoader.load(url, resolve);
+            });
+          }
+
+          const texture = await loadTexture(itemData.texture);
+          const daeLoader = new ColladaLoader();
+          const GltfLoader = new GLTFLoader();
+          const loader = itemData.gltf == undefined ? daeLoader : GltfLoader
+          loader.load(
+            itemData.sceneFileURL,
+            function (mockups) {
+              let mockup = mockups.scene;
+
+              mockup.traverse(function (node) {
+                if (node.isMesh) {
+                  node.material.color = new THREE.Color(0xffffff);
+                  node.material.blending = THREE.NoBlending;
+                  node.material.alphaTest = 0.5;
+                  node.material.transparent = false;
+                  // node.material.side = THREE.DoubleSide; // Enable back-faces
+                  if (node.material.name == itemData.targetMaterialName) {
+                    node.material.map = texture;
+                  }
+                }
+              });
+
+              scene.add(mockup);
+              camera = scene.getObjectByName(itemData.camera.name);
+
+              if (!camera) {
+                console.error({message: "Camera not found"});
+              }
+
+              camera.aspect = itemData.camera.frameWidth / itemData.camera.frameHeight;
+
+              if (camera.type == "OrthographicCamera") {
+                camera.zoom = scene.getObjectByName("zoom").position.x * 100 || 20;
+                camera.left = -camera.aspect;
+                camera.right = camera.aspect;
+                camera.top = 1;
+                camera.bottom = -1;
+              }
+              camera.updateProjectionMatrix();
+              renderer.render(scene, camera);
+
+              let div = document.createElement("div");
+              div.setAttribute("id", "rendered");
+              document.body.appendChild(div);
+            },
+            undefined,
+            (error) => console.error(error)
+          );
+        }catch(e){ 
+          await sentLog(e.message)
+          axios.post('http://127.0.0.1:'+ port +'/closeBrowser')
+        }
       };
     </script>
   </body>
