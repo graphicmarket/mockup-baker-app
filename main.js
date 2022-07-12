@@ -48,7 +48,6 @@ ipcMain.on("getVersion", async (event, data) => {
 });
 ipcMain.on("getIcon", async (event, data) => {
   let path = getResourceAtPath(["assets", `baker-dock-icon.png`]);
-  console.log(path)
   event.reply("sendIconPath", path);
 });
 
