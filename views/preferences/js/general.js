@@ -4,10 +4,11 @@ function getPort() {
     let numberText = document.getElementById("numberText");
 
     const validateFunction = (e) => {
+        console.log(e.target.value)
         if (e.key === "Enter") {
             e.preventDefault();
         }
-
+        
         let valuePort = Number(e.target.value);
         if (!isNaN(valuePort) && valuePort > 0 && valuePort < 65536) {
             numberText.classList.remove("numberTextError");
@@ -15,8 +16,8 @@ function getPort() {
         } else {
             numberText.classList.remove("numberTextSuccess");
             numberText.classList.add("numberTextError");
-            aplicationPort.classList.add("aplicationPort");
-            numberText.innerHTML = "The port must be between 0 and 65536";
+            aplicationPort.classList.add("borderRed");
+            numberText.innerHTML = "The port must be between 0 and 65535";
         }
     };
 
@@ -38,16 +39,20 @@ function getPort() {
         }
     });
 
-    const setPort = (valuePort) => {
+    const setPort = () => {
         ipcRenderer.send("setPort", aplicationPort.value);
         ipcRenderer.on("setPort", (event, data) => {
-            if (!data) {
-                getPort();
-            } else {
+            console.log(data)
+            if (data) {
+                aplicationPort.classList.remove("borderRed");
                 numberText.classList.add("numberTextSuccess");
-                aplicationPort.classList.remove("aplicationPort");
                 numberText.innerHTML = "Port changed successfully";
                 //Timeout para quitar el texto y la clase numberTextSuccess
+                setTimeout(() => {
+                    numberText.innerHTML = "";
+                }, 2000);
+            } else {
+                getPort();
             }
         });
     }

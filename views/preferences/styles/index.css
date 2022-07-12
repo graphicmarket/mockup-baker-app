@@ -68,7 +68,7 @@ hr.solid {
   border: 2px solid rgb(143, 172, 237);
 }
 
-.aplicationPort {
+.borderRed {
   border: 2px solid red;
 }
 
@@ -103,3 +103,8 @@ hr.solid {
   justify-content: right;
   align-items:flex-start;
 }
+
+.not-active { 
+  cursor: not-allowed;
+  pointer-events: none;
+} 
