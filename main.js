@@ -43,6 +43,10 @@ ipcMain.on("closePreferences", async (event, data) => {
   );
 });
 
+ipcMain.on("getVersion", async (event, data) => {
+  event.reply("sendVersion", app.getVersion());
+});
+
 ipcMain.on("getPort", async (event, data) => {
   if (!store.get('port')) {
     store.set('port', 8008)
@@ -249,7 +253,7 @@ const removeCache = async () => {
       if (err) throw err;
     
       for (const file of files) {
-        if (/\.(dae|obj)$/i.test(file)) {
+        if (/\.(dae|gltf)$/i.test(file)) {
           fs.unlink(path.join(configfile, file), err => {
             if (err) throw err;
           });
@@ -359,28 +363,13 @@ let menuTrayTemplate = [
     type: "separator",
   },
   {
-    label: "Help",
-    id: "help",
-    click: function () {
-      shell.openExternal("https://originalmockups.com");
-    },
-  },
-  {
     label: "Check for updates",
     id: "updates",
-    enabled: true,
+    enabled: false,
     click: function () {
       if (app.isPackaged) {
         autoUpdater.checkForUpdates();
       }
-    },
-  },
-  {
-    label: "Clear cache",
-    id: "cache",
-    enabled: true,
-    click: function () {
-      removeCache()
     },
   },
   {
@@ -395,6 +384,24 @@ let menuTrayTemplate = [
         preferencesWindow('general');
       }
     },
+  },
+  {
+    label: "Clear cache",
+    id: "cache",
+    enabled: true,
+    click: function () {
+      removeCache()
+    },
+  },
+  {
+    label: "Help",
+    id: "help",
+    click: function () {
+      shell.openExternal("https://originalmockups.com");
+    },
+  },
+  {
+    type: "separator",
   },
   {
     label: "Quit",
@@ -437,7 +444,7 @@ autoUpdater.on("update-downloaded", (_event, releasesNotes, releaseName) => {
   const dialogOpts = {
     type: "info",
     buttons: ['Restart', 'Later'],
-    title: "Application Update",
+    title: "Application Updated",
     message: "Notas de versión",
     detail: "Restart the application."
   }

@@ -110,7 +110,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
       camera,
       scene
     }
-    const browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
       args: [
         '--no-sandbox',
         '--disable-web-security',

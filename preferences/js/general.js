@@ -55,4 +55,15 @@ function getPort() {
     }
 }
 
+function getVersion() {
+    const { ipcRenderer } = require('electron');
+    let versionText = document.getElementById("versionText");
+    ipcRenderer.send("getVersion", true);
+    ipcRenderer.on("sendVersion", (event, data) => {
+        if (data) {
+            versionText.innerHTML = `Version ${data}`;
+        }
+    });
+}
+
 global.getPort = getPort
