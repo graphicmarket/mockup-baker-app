@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="../styles/index.css" />
+    <link
+      rel="stylesheet"
+      href="../styles/font-awesome-4.7.0/css/font-awesome.min.css"
+    />
+    <title>Info</title>
+  </head>
+  <body>
+    <header>
+      <div id="menuList">
+        <a href="general.html">
+          <button class="btn">
+            <i class="fa fa-cog fa-2x"></i>
+            General
+          </button>
+        </a>
+        <a href="info.html">
+          <button class="btn active">
+            <i class="fa fa-info-circle fa-2x"></i>
+            Info
+          </button>
+        </a>
+        <a href="update.html" class="not-active">
+          <button class="btn">
+            <i class="fa fa-refresh fa-2x"></i>
+            Update
+          </button>
+        </a>
+      </div>
+    </header>
+    <hr class="solid" />
+    <div id="generalForm">
+      <img id="iconBaker" alt=""><br />
+      <label id="aboutTitle">Mockup Baker</label>
+      <div class="aboutDetail">
+        <span id="versionText"></span>
+      </div>
+      <div class="aboutRigths">
+        <span>Copyright © 2022 Original Mockups.</span><br />
+        <span>All rights reserved</span>
+      </div>
+    </div>
+    <script src="../js/general.js"></script>
+    <script>
+      getVersion();
+      getIcon();
+    </script>
+  </body>
+</html>
