@@ -259,9 +259,9 @@ const getNativeIcon = async (iconId) => {
   return nativeImage.createFromPath(await getIconPath(iconId)).resize({ width: 16 })
 }
 
-const preferencesWindow = () => {
+const preferencesWindow = (preferencesView) => {
   newPreferenceWindow = new BrowserWindow({
-    width: 1024,
+    width: 592,
     height: 346,
     title: 'Mockup Baker',
     resizable: false,
@@ -276,16 +276,15 @@ const preferencesWindow = () => {
   newPreferenceWindow.setMenu(null);
 
   newPreferenceWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'views/preferences/views/general.html'),
+    pathname: path.join(__dirname, `views/preferences/views/${preferencesView}.html`),
     protocol: 'file',
     slashes: true
   }));
-  newPreferenceWindow.on('close', (evnt) => {
-    evnt.preventDefault();
-    newPreferenceWindow.hide()
-    newPreferenceWindow = undefined;
+  newPreferenceWindow.on('closed', (evnt) => {
+    //evnt.preventDefault();
+    //newPreferenceWindow.hide();
+    newPreferenceWindow = null;
   });
-  newPreferenceWindow.webContents.openDevTools()
 };
 
 let menuTrayTemplate = [
@@ -293,7 +292,13 @@ let menuTrayTemplate = [
     label: "About Mockup Baker..",
     id: "about",
     enabled: true,
-    click: function () { },
+    click: function () {
+      if (newPreferenceWindow != undefined) {
+        newPreferenceWindow.show()
+      } else {
+        preferencesWindow('info');
+      }
+    },
   },
   {
     type: "separator",
@@ -358,7 +363,7 @@ let menuTrayTemplate = [
       if (newPreferenceWindow != undefined) {
         newPreferenceWindow.show()
       } else {
-        preferencesWindow();
+        preferencesWindow('general');
       }
     },
   },

@@ -75,3 +75,31 @@ hr.solid {
 #aplicationPort::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
+
+.numberTextError {
+  display: block;
+  width : 60%;
+  margin-top: 3px;
+  font-size: 80%;
+  color: red;
+  text-align: left;
+}
+
+.numberTextSuccess {
+  display: block;
+  width : 60%;
+  margin-top: 3px;
+  font-size: 80%;
+  color: rgb(70, 133, 247);
+  text-align: left;
+}
+
+#numberText.active {
+  padding: 0.3em;
+}
+
+.parent {
+  display: flex;
+  justify-content: right;
+  align-items:flex-start;
+}
