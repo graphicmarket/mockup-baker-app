@@ -318,7 +318,7 @@ const preferencesWindow = (preferencesView) => {
 
 let menuTrayTemplate = [
   {
-    label: "About Mockup Baker..",
+    label: "About Mockup Baker",
     id: "about",
     enabled: true,
     click: function () {
