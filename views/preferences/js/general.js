@@ -11,9 +11,6 @@ function getPort() {
         let valuePort = Number(e.target.value);
         if (!isNaN(valuePort) && valuePort > 0 && valuePort < 65536) {
             numberText.classList.remove("numberTextError");
-            numberText.classList.add("numberTextSuccess");
-            aplicationPort.classList.remove("aplicationPort");
-            numberText.innerHTML = "Port changed successfully";
             setPort(valuePort);
         } else {
             numberText.classList.remove("numberTextSuccess");
@@ -24,7 +21,7 @@ function getPort() {
     };
 
     aplicationPort.addEventListener('keypress', validateFunction, false);
-    aplicationPort.addEventListener('focusout', validateFunction, false);
+    aplicationPort.addEventListener('keyup', validateFunction, false);
 
     ipcRenderer.send("getPort", true);
     ipcRenderer.on("sendPort", (event, data) => {
@@ -46,6 +43,11 @@ function getPort() {
         ipcRenderer.on("setPort", (event, data) => {
             if (!data) {
                 getPort();
+            } else {
+                numberText.classList.add("numberTextSuccess");
+                aplicationPort.classList.remove("aplicationPort");
+                numberText.innerHTML = "Port changed successfully";
+                //Timeout para quitar el texto y la clase numberTextSuccess
             }
         });
     }
