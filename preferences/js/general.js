@@ -65,5 +65,15 @@ function getVersion() {
         }
     });
 }
+function getIcon() {
+    const { ipcRenderer } = require('electron');
+    let icon = document.getElementById("iconBaker");
+    ipcRenderer.send("getIcon", true);
+    ipcRenderer.on("sendIconPath", (event, data) => {
+        if (data) {
+            icon.setAttribute("src", data)
+        }
+    });
+}
 
 global.getPort = getPort

@@ -46,6 +46,11 @@ ipcMain.on("closePreferences", async (event, data) => {
 ipcMain.on("getVersion", async (event, data) => {
   event.reply("sendVersion", app.getVersion());
 });
+ipcMain.on("getIcon", async (event, data) => {
+  let path = getResourceAtPath(["assets", `baker-dock-icon.png`]);
+  console.log(path)
+  event.reply("sendIconPath", path);
+});
 
 ipcMain.on("getPort", async (event, data) => {
   if (!store.get('port')) {
@@ -92,7 +97,7 @@ app.on("ready", async function () {
 });
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    app.quit();
+    //app.quit();
   }
 });
 //Update Theme
