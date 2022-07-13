@@ -48,7 +48,8 @@
       "publish": [
         "github"
       ],
-      "asar": false
+      "asar": true,
+      "asarUnpack": true
     },
     "extraResources": [
       "./assets/**",

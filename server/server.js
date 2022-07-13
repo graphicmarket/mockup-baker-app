@@ -120,6 +120,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
         "--use-gl=angle",
         "--disable-features=MITMSoftwareInterstitial"
       ],
+      executablePath: path.join(app.getAppPath(), 'node_modules/puppeteer/.local-chromium/win64-1002410/chrome-win/chrome.exe').replace('app.asar', 'app.asar.unpacked')
     })
     
     const page = await browser.newPage()
