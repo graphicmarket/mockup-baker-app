@@ -4,10 +4,9 @@ function getPort() {
     let numberText = document.getElementById("numberText");
 
     const validateFunction = (e) => {
-        console.log(e.target.value)
         if (e.key === "Enter" && e.type == "keypress") {
             e.preventDefault();
-        } else if (e.type == "keyup"){
+        } else if (e.type == "keyup") {
             let valuePort = Number(e.target.value);
             if (!isNaN(valuePort) && valuePort > 0 && valuePort < 65536) {
                 numberText.classList.remove("numberTextError");
@@ -53,6 +52,33 @@ function getPort() {
             }
         });
     }
+}
+
+function showAplicationIcon(data) {
+    let checkShowAplicationIcon = document.getElementById("checkShowAplicationIcon");
+    checkShowAplicationIcon.checked = data;
+}
+
+function getStateDock(state) {
+    console.log('getStateDock', state)
+    const { ipcRenderer } = require('electron');
+    ipcRenderer.send("showDockIcon", state);
+    ipcRenderer.on("showDockIcon", (event, data) => {
+
+        console.log(data)
+        showAplicationIcon(data);
+    });
+}
+
+function clearCache() {
+    const { ipcRenderer } = require('electron');
+    ipcRenderer.send("clearCache", true);
+    ipcRenderer.on("removeCache", (event, data) => {
+        if (data) {
+            console.log('remove cache sucsess')
+            // Span
+        }
+    });
 }
 
 function getVersion() {

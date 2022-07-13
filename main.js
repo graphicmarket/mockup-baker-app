@@ -43,9 +43,23 @@ ipcMain.on("closePreferences", async (event, data) => {
   );
 });
 
+ipcMain.on("clearCache", async (event, data) => {
+  await removeCache()
+  event.reply("removeCache", true);
+});
+
+ipcMain.on("showDockIcon", async (event, data) => {
+  if(data !== null) {
+    await store.set('showDock', data);
+    await changeStateDock();
+  }
+  event.reply("showDockIcon", store.get('showDock'));
+});
+
 ipcMain.on("getVersion", async (event, data) => {
   event.reply("sendVersion", app.getVersion());
 });
+
 ipcMain.on("getIcon", async (event, data) => {
   let path = getResourceAtPath(["assets", `baker-dock-icon.png`]);
   event.reply("sendIconPath", path);
@@ -71,9 +85,12 @@ ipcMain.on("setPort", async (event, data) => {
   }
 });
 
-const getInitialPort = () => {
+const getInitialState = () => {
   if (!store.get('port')) {
     store.set('port', 8008)
+  }
+  if (store.get('showDock') === null) {
+    store.set('showDock', true)
   }
 };
 
@@ -87,12 +104,12 @@ app.whenReady().then(async () => {
   }
 });
 app.on("ready", async function () {
-  await getInitialPort();
+  await getInitialState();
   await validateAplicactionFolder();
   await createFolder();
   await initialTrayIcons();
   await validatePlugin();
-  await hideFromDock();
+  await changeStateDock();
 });
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -158,9 +175,13 @@ const validateAplicactionFolder = async () => {
     }
   }
 }
-const hideFromDock = async () => {
+const changeStateDock = async () => {
   if (process.platform == "darwin") {
-    app.dock.hide();
+    if(store.get('showDock')) {
+      app.dock.show();
+    } else {
+      app.dock.hide();
+    }
   }
 };
 const initialTrayIcons = async () => {
