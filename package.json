@@ -37,10 +37,11 @@
     "mac": {
       "category": "public.app-category.graphics-design",
       "icon": "assets/baker-dock-icon.png",
-      "asar": false,
       "publish": [
         "github"
-      ]
+      ],
+      "asar": true,
+      "asarUnpack": true
     },
     "win": {
       "target": "nsis",
@@ -48,7 +49,8 @@
       "publish": [
         "github"
       ],
-      "asar": false
+      "asar": true,
+      "asarUnpack": true
     },
     "extraResources": [
       "./assets/**",
