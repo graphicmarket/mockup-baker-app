@@ -110,6 +110,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
       camera,
       scene
     }
+    let chr = process.platform == "darwin" ? 'node_modules/puppeteer/.local-chromium/mac-1002410/chrome-mac/Chromium.app' : 'node_modules/puppeteer/.local-chromium/win64-1002410/chrome-win/chrome.exe'
     browser = await puppeteer.launch({
       args: [
         '--no-sandbox',
@@ -120,7 +121,7 @@ async function renderProcess({ camera, folder, scene, targetMaterialName, textur
         "--use-gl=angle",
         "--disable-features=MITMSoftwareInterstitial"
       ],
-      executablePath: path.join(app.getAppPath(), 'node_modules/puppeteer/.local-chromium/win64-1002410/chrome-win/chrome.exe').replace('app.asar', 'app.asar.unpacked')
+      executablePath: path.join(app.getAppPath(), chr).replace('app.asar', 'app.asar.unpacked')
     })
     
     const page = await browser.newPage()
