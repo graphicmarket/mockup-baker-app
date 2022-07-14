@@ -1,0 +1,50 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: rgb(239, 239, 239);
+}
+
+#menuList {
+  list-style-type: none;
+  text-align: center;
+  margin-top: 5px;
+  padding: 0;
+}
+
+#menuList a {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: small;
+  text-decoration: none;
+}
+
+i.fa {
+  display: block;
+}
+
+.btn {
+  display: inline-block;
+  padding: 3px;
+  width: 58px;
+  height: 48px;
+  cursor: pointer;
+  background-color: transparent;
+  color: rgb(109, 109, 109);
+  border: none;
+  border-radius: 8px;
+}
+
+/* Style the active class, and buttons on mouse-over */
+.active,
+.btn:hover {
+  background-color: rgb(229, 227, 227);
+}
+
+a .active {
+  background-color: rgb(229, 227, 227);
+  color: rgb(70, 133, 247);
+}
+
+/* Solid border */
+hr.solid {
+  border-top: 0.5px solid rgb(214, 214, 214);
+}

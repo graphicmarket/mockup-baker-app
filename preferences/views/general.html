@@ -1,19 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="../styles/index.css" />
-    <link rel="stylesheet" href="../styles/font-awesome-4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="../styles/menuList.css" />
+    <link rel="stylesheet" href="../styles/general.css" />
+    <link
+      rel="stylesheet"
+      href="../styles/font-awesome-4.7.0/css/font-awesome.min.css"
+    />
     <title>General</title>
-    <style>
-      .mystyle {
-        width: 100%;
-        padding: 25px;
-        background-color: coral;
-        color: white;
-        font-size: 25px;
-        box-sizing: border-box;
-      }
-      </style>
   </head>
   <body>
     <header>
@@ -27,7 +21,7 @@
         <a href="info.html">
           <button class="btn">
             <i class="fa fa-info-circle fa-2x"></i>
-            Info
+            About
           </button>
         </a>
         <a href="update.html" class="not-active">
@@ -38,17 +32,50 @@
         </a>
       </div>
     </header>
-    <hr class="solid">
-    <form id="generalForm">
-      <label for="aplicationPort">Aplication port: </label>
-      <input type="number" name="port" id="aplicationPort"/>
-      <div class="parent">
-        <span id="numberText"></span>
+
+    <hr class="solid" />
+
+    <div class="grid-container">
+      <div class="grid-item alignRight">
+        <label for="aplicationPort">Aplication port:</label>
       </div>
-    </form>
+      <div class="grid-item alignLeft">
+        <input type="number" name="port" id="aplicationPort" />
+      </div>
+      <div class="grid-item"></div>
+      <div class="grid-item">
+        <div class="alignLeft">
+          <span id="numberText">
+            Port used in the application
+          </span>
+        </div>
+      </div>
+      <div class="grid-item alignRight">
+        <label>App Icon:</label>
+      </div>
+      <div class="grid-item alignLeft">
+        <input id="checkShowAplicationIcon" onclick="getStateDock(this.checked)" type="checkbox" />
+        <label>Enable dock icon</label>
+      </div>
+      <div class="grid-item alignRight">
+        <label>Clear cache:</label>
+      </div>
+      <div class="grid-item alignLeft">
+        <button id="btnClearCache" onclick="clearCache()" >Clear</button>
+      </div>
+      <div class="grid-item"></div>
+      <div class="grid-item">
+        <div class="alignLeft">
+          <span id="cacheText" class="numberTextSuccess" style="display: none;">
+            Cache cleared 
+          </span>
+        </div>
+      </div>
+    </div>
     <script src="../js/general.js"></script>
     <script>
       getPort();
+      getStateDock(null);
     </script>
   </body>
 </html>
