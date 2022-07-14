@@ -52,6 +52,7 @@ ipcMain.on("showDockIcon", async (event, data) => {
   if(data !== null) {
     await store.set('showDock', data);
     await changeStateDock();
+    await newPreferenceWindow.show()
   }
   event.reply("showDockIcon", store.get('showDock'));
 });
@@ -74,7 +75,6 @@ ipcMain.on("getPort", async (event, data) => {
 });
 
 ipcMain.on("setPort", async (event, data) => {
-  console.log(data)
   if (data !== null) {
     store.set('port', data)
     if (status.server) {
@@ -109,6 +109,7 @@ app.on("ready", async function () {
   await createFolder();
   await initialTrayIcons();
   await validatePlugin();
+  await mapMenu()
   await changeStateDock();
 });
 app.on("window-all-closed", () => {
@@ -119,6 +120,10 @@ app.on("window-all-closed", () => {
 //Update Theme
 nativeTheme.on("updated", async () => {
   try {
+    /* // Change theme from window
+    if (newPreferenceWindow !== undefined) {
+      newPreferenceWindow.webContents.send('changeTheme',nativeTheme.shouldUseDarkColors)
+    }*/
     trayImage = await getNativeIcon('baker-tray-icon')
     tray.setImage(trayImage);
     await changeAtributteMenu('plugin', '', 'baker-tray-menu-install-plugin')
@@ -146,7 +151,17 @@ const changeMenu = async (event) => {
       break;
   }
   tray.setContextMenu(Menu.buildFromTemplate(menuTrayTemplate));
+  await mapMenu()
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+  app.dock.setMenu(Menu.buildFromTemplate(menuTrayTemplate))
 };
+const mapMenu = async () => {
+  let menu = template.find((item) => item.id == 'MockupBaker')
+  menu.submenu = []
+  for (let item of menuTrayTemplate) {
+    menu.submenu.push(item)
+  }
+}
 const changeAtributteMenu = async (id, label = '', icon = '') => {
   if (label != '') {
     menuTrayTemplate.find((item) => item.id == id).label = label;
@@ -195,6 +210,7 @@ const validatePlugin = async () => {
   for (let line of result) {
     if (
       line.includes("Mockup Baker") &&
+      line.includes(app.getVersion()) &&
       !line.includes("Mockup Baker Assemblers")
     ) {
       changeMenu("server-on");
@@ -309,7 +325,7 @@ const getNativeIcon = async (iconId) => {
   return nativeImage.createFromPath(await getIconPath(iconId)).resize({ width: 16 })
 }
 
-const preferencesWindow = (preferencesView) => {
+const preferencesWindow = async (preferencesView) => {
   newPreferenceWindow = new BrowserWindow({
     width: 592,
     height: 346,
@@ -324,18 +340,19 @@ const preferencesWindow = (preferencesView) => {
     },
   });
   newPreferenceWindow.setMenu(null);
-
+  await changeViewPreference(preferencesView)
+  newPreferenceWindow.on('closed', (evnt) => {
+    newPreferenceWindow = undefined;
+  });
+};
+const changeViewPreference = (preferencesView) => {
   newPreferenceWindow.loadURL(url.format({
     pathname: path.join(__dirname, `preferences/views/${preferencesView}.html`),
     protocol: 'file',
     slashes: true
   }));
-  newPreferenceWindow.on('closed', (evnt) => {
-    //evnt.preventDefault();
-    //newPreferenceWindow.hide();
-    newPreferenceWindow = null;
-  });
-};
+  newPreferenceWindow.show()
+}
 
 let menuTrayTemplate = [
   {
@@ -344,7 +361,7 @@ let menuTrayTemplate = [
     enabled: true,
     click: function () {
       if (newPreferenceWindow != undefined) {
-        newPreferenceWindow.show()
+        changeViewPreference('info');
       } else {
         preferencesWindow('info');
       }
@@ -365,19 +382,6 @@ let menuTrayTemplate = [
     },
   },
   {
-    label: "Plugins",
-    id: "allPlugin",
-    visible: false,
-    submenu: [
-      {
-        label: 'Install Mockup Baker Plugin'
-      },
-      {
-        label: 'Install Assembler Plugin'
-      },
-    ],
-  },
-  {
     label: "Start Server",
     id: "server",
     click: async function () {
@@ -388,34 +392,16 @@ let menuTrayTemplate = [
     type: "separator",
   },
   {
-    label: "Check for updates",
-    id: "updates",
-    enabled: false,
-    click: function () {
-      if (app.isPackaged) {
-        autoUpdater.checkForUpdates();
-      }
-    },
-  },
-  {
     label: "Preferences",
     id: "preferences",
     enabled: true,
     accelerator: process.platform == "darwin" ? "Command+," : "Ctrl+Q",
     click: () => {
       if (newPreferenceWindow != undefined) {
-        newPreferenceWindow.show()
+        changeViewPreference('general');
       } else {
         preferencesWindow('general');
       }
-    },
-  },
-  {
-    label: "Clear cache",
-    id: "cache",
-    enabled: true,
-    click: function () {
-      removeCache()
     },
   },
   {
@@ -437,6 +423,15 @@ let menuTrayTemplate = [
     },
   },
 ];
+const template = [
+  {
+    label: app.name,
+    id: 'MockupBaker',
+    submenu: [
+    ]
+  }
+]
+
 //Updates 
 autoUpdater.on("update-available", (_event, releasesNotes, releaseName) => {
   const dialogOpts = {

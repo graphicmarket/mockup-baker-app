@@ -1,6 +1,10 @@
 /* About View */
+.not-active { 
+  cursor: not-allowed;
+  pointer-events: none;
+}
 #generalForm {
-  margin-top: 20px;
+  margin-top: 10px;
   text-align: center;
   color: rgb(36, 36, 36);
   font-family: Arial, Helvetica, sans-serif;

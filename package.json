@@ -1,6 +1,6 @@
 {
   "name": "mockupbaker-app",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Mockup Baker app",
   "main": "main.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac"
   },
-  "author": "graphic.market",
+  "author": "Graphic Market",
   "license": "MIT",
   "dependencies": {
     "electron-log": "^4.4.7",

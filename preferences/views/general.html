@@ -21,7 +21,7 @@
         <a href="info.html">
           <button class="btn">
             <i class="fa fa-info-circle fa-2x"></i>
-            Info
+            About
           </button>
         </a>
         <a href="update.html" class="not-active">
@@ -51,17 +51,25 @@
         </div>
       </div>
       <div class="grid-item alignRight">
-        <label>Show application icon:</label>
+        <label>App Icon:</label>
       </div>
       <div class="grid-item alignLeft">
         <input id="checkShowAplicationIcon" onclick="getStateDock(this.checked)" type="checkbox" />
-        <label>Show application icon in dock bar</label>
+        <label>Enable dock icon</label>
       </div>
       <div class="grid-item alignRight">
         <label>Clear cache:</label>
       </div>
       <div class="grid-item alignLeft">
         <button id="btnClearCache" onclick="clearCache()" >Clear</button>
+      </div>
+      <div class="grid-item"></div>
+      <div class="grid-item">
+        <div class="alignLeft">
+          <span id="cacheText" class="numberTextSuccess" style="display: none;">
+            Cache cleared 
+          </span>
+        </div>
       </div>
     </div>
     <script src="../js/general.js"></script>

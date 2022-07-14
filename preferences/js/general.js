@@ -54,9 +54,15 @@ function getPort() {
     }
 }
 
-function showAplicationIcon(data) {
+function showAplicationIcon(data,state) {
     let checkShowAplicationIcon = document.getElementById("checkShowAplicationIcon");
     checkShowAplicationIcon.checked = data;
+    if (state !== null) {
+        checkShowAplicationIcon.setAttribute('disabled','')
+        setTimeout(() => {
+            checkShowAplicationIcon.removeAttribute('disabled', "")
+        }, 800);
+    }
 }
 
 function getStateDock(state) {
@@ -64,19 +70,25 @@ function getStateDock(state) {
     const { ipcRenderer } = require('electron');
     ipcRenderer.send("showDockIcon", state);
     ipcRenderer.on("showDockIcon", (event, data) => {
-
-        console.log(data)
-        showAplicationIcon(data);
+        showAplicationIcon(data,state);
     });
 }
 
 function clearCache() {
+    let cacheText = document.getElementById("cacheText");
+    let btnClearCache = document.getElementById("btnClearCache");
     const { ipcRenderer } = require('electron');
     ipcRenderer.send("clearCache", true);
     ipcRenderer.on("removeCache", (event, data) => {
         if (data) {
-            console.log('remove cache sucsess')
-            // Span
+            cacheText.style.display = "block";
+            btnClearCache.setAttribute('disabled', "")
+            btnClearCache.classList.add("buttonDisabled")
+            setTimeout(() => {
+                cacheText.style.display = "none";
+                btnClearCache.removeAttribute('disabled', "")
+                btnClearCache.classList.remove("buttonDisabled")
+            }, 1000);
         }
     });
 }
@@ -101,5 +113,15 @@ function getIcon() {
         }
     });
 }
+
+/* // Change theme
+require('electron').ipcRenderer.on('changeTheme', (event, message) => {
+    if (message) {
+        document.body.style.backgroundColor = 'rgb(42, 40, 41)'
+    } else {
+        document.body.style.backgroundColor = 'rgb(242, 240, 241)'
+    }
+})
+*/
 
 global.getPort = getPort

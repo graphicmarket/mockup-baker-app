@@ -1,3 +1,4 @@
+
 #aplicationPort {
   width: 200px;
   box-sizing: border-box;
@@ -54,6 +55,7 @@
 }
 
 .alignRight {
+  padding-right: 10px;
   text-align: right;
 }
 
@@ -74,6 +76,11 @@ input[type="checkbox"] {
   text-decoration: none;
   cursor: pointer;
   border-radius: 4px
+}
+
+.buttonDisabled {
+  background-color: rgb(205, 205, 205) !important;
+  color: white !important;
 }
 
 .grid-container {
